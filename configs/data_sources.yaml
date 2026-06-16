@@ -175,3 +175,129 @@ api_keys:
     - Hyperliquid
     - CoinGlass
     - Coinalyze
+
+# =============================================================================
+# Paper 6 — FX Carry & Commodity Roll Yield (APPENDED 2026-06-16)
+# Fetcher: scripts/10_fetch_fx_commodity.py  (no API key; in-process `requests`,
+# the bash sandbox here has no network). Manifest: data/_paper6_manifest.json.
+# Profile + BLOCKERS: research/paper6_data_profile.md.
+# NOTE: supersedes the `datasets.fx_spot_forward_rates` /
+# `datasets.commodity_futures_term_structure` TODO stubs above (those remain only
+# for the un-sourced forward-points / front+second-futures pieces — see blockers).
+# =============================================================================
+fx:
+  source: "FRED daily USD bilateral rates + OECD 3M interbank + BIS REER (all via FRED, no key); CFTC COT (publicreporting.cftc.gov, no key)."
+  used_for: "Paper #6 — FX Carry (rate differential) + Value (REER), G10 vs USD."
+  verified: true   # fetched, normalized, QA'd 2026-06-16; 0 failures
+  size: ~6.1M
+  base_url_fred: "https://fred.stlouisfed.org/graph/fredgraph.csv?id=<ID>"
+  base_url_cot: "https://publicreporting.cftc.gov/resource/6dca-aqww.csv"
+
+  SIGN_CONVENTION: >-
+    SPOT IS NORMALIZED TO FOREIGN-CURRENCY-UNITS-PER-1-USD (col '<CCY>_per_USD').
+    A RISE = USD APPRECIATES / foreign currency DEPRECIATES. FRED IDs quoted as
+    'USD per foreign' (DEXUSEU/DEXUSUK/DEXUSAL/DEXUSNZ) are INVERTED (1/rate);
+    'foreign per USD' IDs (DEXJPUS/DEXCAUS/DEXSZUS/DEXSDUS/DEXNOUS) kept as-is.
+    Each spot_<CCY>.csv also keeps the untouched native column '<CCY>_native'.
+    CARRY diff = rate_foreign_OECD3M - rate_USD_OECD3M (pct pts; +ve = long-carry).
+    VALUE (REER, index 2020=100): higher = currency real-EXPENSIVE (short the rich).
+
+  spot:
+    panel: "data/fx/panel_spot_FXperUSD.csv  (cols date,EUR,JPY,GBP,CAD,AUD,CHF,SEK,NOK,NZD; 14465 rows; 1971-01-04..2026-06-12; EUR NaN pre-1999)"
+    per_ccy: "data/fx/spot_<CCY>.csv  (cols date,<CCY>_native,<CCY>_per_USD)"
+    fred_ids: "EUR=DEXUSEU(inv) JPY=DEXJPUS GBP=DEXUSUK(inv) CAD=DEXCAUS AUD=DEXUSAL(inv) CHF=DEXSZUS SEK=DEXSDUS NOK=DEXNOUS NZD=DEXUSNZ(inv)"
+    cadence: "daily; ~560 NaN/ccy over the span = US/foreign market holidays (no internal gaps)."
+  carry:
+    usd_leg: "data/fx/rate_USD_DGS3MO.csv  (FRED DGS3MO, 3M T CMT, DAILY, 1981-09-01..2026-06-15, 11685 rows, percent)"
+    foreign_legs: "data/fx/rate_<CCY>_OECD3M.csv  (OECD 3M interbank IR3TIB01<CC>M156N, MONTHLY; CC: EUR=EZ JPY=JP GBP=GB CAD=CA AUD=AU CHF=CH SEK=SE NOK=NO NZD=NZ USD=US)"
+    diff_panel: "data/fx/panel_carry_diff_OECD3M_vs_USD.csv  (foreign_OECD3M - USD_OECD3M, pct pts, MONTHLY, 743 rows, 1964-06..2026-05)"
+    caveats: "EUR=euro-area aggregate; JPY starts 2002-04, CHF 1999-07; staggered publication => latest 1-4 months NaN for EUR/JPY/GBP. Daily carry needs ffill of monthly foreign rate vs daily DGS3MO."
+  value_reer:
+    panel_broad: "data/fx/panel_reer_broad.csv   (RB<CC>BIS, broad basket, MONTHLY, index 2020=100, 388 rows, 1994-01..2026-04) [PRIMARY]"
+    panel_narrow: "data/fx/panel_reer_narrow.csv (RN<CC>BIS, narrow basket, MONTHLY, 748 rows, 1964-01..2026-04) [long-history robustness]"
+    per_ccy: "data/fx/reer_{broad,narrow}_<CCY>.csv"
+    note: "9 G10 + euro-area (XM, mapped to EUR). RBEUBIS/RNEUBIS 404 -> use XM."
+  positioning_cot:
+    files: "data/fx/cot_<CCY>.csv  (CFTC legacy futures-only; cols date,open_interest_all,noncomm_long/short,noncomm_net,noncomm_net_pct_oi; WEEKLY)"
+    spans: "EUR/JPY/CAD/CHF 2000-08+, GBP/AUD 2004-01+, NZD 2004-08+, all -> 2026-06-09"
+    note: "spec(non-commercial) net length. Old+new CME market names stitched (CFTC renamed ~2022-02): GBP STERLING->POUND, NEW ZEALAND DOLLAR->NZ DOLLAR."
+
+commodity:
+  source: "FRED daily energy front-month + FRED/IMF monthly metals/ags (no key); CFTC COT (no key)."
+  used_for: "Paper #6 — Commodity price + positioning. ROLL YIELD = BLOCKED (no free front+second futures; see profile Blocker #1)."
+  verified: true   # fetched + QA'd 2026-06-16; 0 failures
+  size: ~1.1M
+  base_url_fred: "https://fred.stlouisfed.org/graph/fredgraph.csv?id=<ID>"
+
+  ROLL_YIELD_STATUS: >-
+    NOT COMPUTABLE FROM FREE SOURCES AS DELIVERED. Roll yield needs front+second
+    contract; all free continuous-futures feeds are dead/walled (Quandl CHRIS 403;
+    Stooq JS anti-bot wall; FRED BCOM/GSCI total-return 404; EIA needs a key). We
+    have FRONT-MONTH SPOT ONLY. Recorded in manifest as
+    commodity.roll_yield_computable_from_free_sources=false. Fix paths: free Nasdaq
+    Data Link or EIA API key (EIA serves PET.RCLC1..4 / NG.RNGC1..4 front..4th).
+
+  price_daily:
+    panel: "data/commodity/panel_price_daily.csv  (cols date,WTI,BRENT,HENRYHUB; 1986-01-02..2026-06-08)"
+    files:
+      - "price_WTI.csv      — DCOILWTICO   WTI Cushing front spot, $/bbl,   1986-01-02..2026-06-08, 10177 rows (incl. -36.98 on 2020-04-20)"
+      - "price_BRENT.csv    — DCOILBRENTEU Brent front spot,       $/bbl,   1987-05-20..2026-06-08, 9907 rows"
+      - "price_HENRYHUB.csv — DHHNGSP      Henry Hub gas spot,     $/MMBtu, 1997-01-07..2026-06-08, 7387 rows"
+  price_monthly:
+    files:
+      - "price_COPPER.csv      — PCOPPUSDM     IMF copper,            $/mt,            1992-01..2026-05, 413 rows"
+      - "price_MAIZE.csv       — PMAIZMTUSDM   IMF maize,             $/mt,            1992-01..2026-05, 413 rows"
+      - "price_WHEAT.csv       — PWHEAMTUSDM   IMF wheat,             $/mt,            1992-01..2026-05, 413 rows"
+      - "price_NGAS_EU.csv     — PNGASEUUSDM   IMF EU nat-gas,        $/MMBtu,         1992-01..2026-05, 413 rows"
+      - "price_BRENT_M.csv     — POILBREUSDM   IMF Brent monthly,     $/bbl,           1992-01..2026-05, 413 rows"
+      - "price_ALLCOMM_IDX.csv — PALLFNFINDEXM IMF all-commodity idx, index 2016=100,  1992-01..2026-06, 414 rows"
+  positioning_cot:
+    files: "data/commodity/cot_<TAG>.csv  (CFTC legacy futures-only; WEEKLY)"
+    spans: "WTI_CRUDE 2000-02+, GOLD 1986-01+, HENRYHUB_GAS 2011-11+, all -> 2026-06-09"
+    note: "GOLD COT (1986+) partially offsets the missing gold spot. WTI stitches CRUDE OIL LIGHT SWEET -> WTI FINANCIAL CRUDE OIL."
+  blockers:
+    - "ROLL YIELD: no free front+second futures (HIGH, binding for Paper 6). Quandl CHRIS 403; Stooq anti-bot; FRED BCOM/GSCI TR 404; EIA needs key."
+    - "GOLD/SILVER/PLATINUM SPOT $/oz: all FRED $/oz IDs discontinued (404). Only producer/CPI indices survive. Gold COT obtained as partial offset."
+
+# =============================================================================
+# Paper 2 — Crypto Carry: Binance USD-M funding + matched spot backfill
+# (APPENDED 2026-06-16). Fetcher: scripts/11_backfill_funding.py
+# Purpose: a clean, cross-sectionally comparable funding cross-section spanning
+# 2023-01 -> 2026, enabling a DECAY TEST of the 2024 carry boom. (The pre-existing
+# datasets.crypto_funding_history is Hyperliquid-sourced, hourly, with a `premium`
+# col, and for the majors only reaches ~2023-06 — not the same exchange/cadence.)
+# =============================================================================
+crypto_funding_backfill:
+  path: /apps/alpha-research/data/funding/
+  verified: true   # built & validated 2026-06-16 by scripts/11_backfill_funding.py
+  used_for: "Paper #2 — Crypto Carry: the Binance USD-M perpetual funding cross-section + matched spot (2023->2026)."
+  source:
+    exchange: "Binance USD-M (perpetual futures), spot from Binance spot."
+    endpoint_USED: "https://data.binance.vision  (official Binance public DATA ARCHIVE; CSV-in-ZIP, monthly + daily)"
+    endpoint_BRIEFED_but_BLOCKED: "https://fapi.binance.com/fapi/v1/fundingRate and https://api.binance.com/api/v3/klines — BOTH return HTTP 451 'restricted location' from this host; every live mirror tested (api1/api-gcp/data-api fapi, binance.us futures) is 451 or 404. The data archive is NOT geo-blocked and serves the identical funding series (no API key, no 429/418, checksummed)."
+    archive_layout:
+      funding_8h: "data/futures/um/monthly/fundingRate/<SYM>/<SYM>-fundingRate-YYYY-MM.zip  -> csv cols: calc_time(ms), funding_interval_hours, last_funding_rate"
+      spot_1d:    "data/spot/{monthly,daily}/klines/<SYM>/1d/<SYM>-1d-<...>.zip  -> kline csv; we keep open_time -> time, close"
+  universe:
+    symbol_pattern: "<COIN>USDT"
+    requested_30: [BTC, ETH, SOL, BNB, XRP, DOGE, ADA, AVAX, LINK, TRX, DOT, MATIC, LTC, BCH, NEAR, APT, ARB, OP, SUI, INJ, TIA, SEI, RUNE, FIL, ATOM, UNI, AAVE, ETC, XLM, ALGO]
+    backfilled: 30   # all 30 have a USDT perp on Binance USD-M; none dropped
+    unavailable: []
+  files:
+    - "<COIN>USDT_funding.parquet — 8h funding; cols: time(UTC, datetime64), funding_rate(float). 30 files."
+    - "<COIN>USDT_spot1d.parquet  — daily spot close; cols: time(UTC), close(float). 30 files."
+    - "panel_funding_8h.parquet   — LONG merged panel; cols: time, symbol, funding_rate. 112,853 rows, 30 symbols, 0 NaN, 0 dup(time,symbol)."
+    - "panel_funding_1d.parquet   — daily MEAN funding per symbol; cols: time(date), symbol, funding_rate. 36,677 rows."
+    - "_coverage.json             — machine-readable per-symbol coverage (earliest/latest, n obs, gaps)."
+  coverage:
+    median_earliest_date: "2023-01-01"
+    total_funding_obs_8h: 112853
+    funding_latest: "2026-05-31 (last Binance-published full month; June-2026 monthly+daily archives not yet released -> funding tail ends 2026-05-31)."
+    spot_latest: "2026-06-15 (spot daily archives are current to T-1)."
+    early_listers: "ARB 2023-03-23, SUI 2023-05-03, SEI 2023-08-16, TIA 2023-10-31 (true Binance listing dates; 26/30 reach 2023-01-01)."
+    gaps: "Zero >8h gaps for all 30 symbols on their listed span (max intra-series gap == the funding interval)."
+  caveats:
+    - "TIA funding is on a 4-HOUR interval (all others 8h). So TIAUSDT_funding has ~2x rows/day; annualise TIA at 3 settlements/day, NOT 1095/yr. The 1d-mean panel already averages within-day so it is comparable; the raw 8h panel is NOT uniform-interval for TIA."
+    - "MATICUSDT: perp funding rows continue to 2026-05-31 but are PINNED to the flat default +0.0001/8h from ~2024-10 onward (no real price discovery) and the MATICUSDT SPOT pair delisted 2024-09-10 (MATIC->POL rename). Treat MATIC carry as effectively ENDING ~2024-09; POLUSDT exists in the archive if a continuation is wanted."
+  profile: /apps/alpha-research/research/paper2_data_profile.md
+  refresh: "Re-run `./.venv/bin/python scripts/11_backfill_funding.py [--workers N]` (idempotent; overwrites). Polite: small per-request sleep + concurrency-limited."

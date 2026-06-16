@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Crypto Carry: The Funding-Rate Cross-Section — Alpha Research</title>
+<meta name="description" content="Is crypto perpetual-funding carry harvestable net of costs? The funding-level harvest is a decayed, artifact-Sharpe trade; but the cross-sectional carry factor is the program's first real net-of-cost, out-of-sample-positive edge.">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="apple-touch-icon" href="favicon-180.png">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Crypto Carry: The Funding-Rate Cross-Section, Net of Costs">
+<meta property="og:description" content="The funding LEVEL is a decayed artifact-Sharpe trade — but the cross-sectional carry FACTOR is the program's first real net-of-cost, out-of-sample-positive edge (OOS Sharpe ~0.4).">
+<meta property="og:url" content="https://bryanvine.github.io/alpha-research/paper2.html">
+<meta property="og:image" content="https://bryanvine.github.io/alpha-research/og-carry.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<script>
+  MathJax = { tex: { inlineMath: [['$','$']] }, svg: { fontCache: 'global' } };
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+  :root{ --ink:#1a1a1a; --muted:#5b6470; --rule:#e3e6ea; --accent:#1f6feb; --bg:#fdfdfc; --code:#f5f6f8; }
+  *{ box-sizing:border-box; }
+  html{ -webkit-text-size-adjust:100%; }
+  body{ margin:0; background:var(--bg); color:var(--ink);
+        font:17px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif; }
+  .wrap{ max-width:820px; margin:0 auto; padding:48px 22px 96px; }
+  header.title{ border-bottom:3px solid var(--ink); padding-bottom:22px; margin-bottom:8px; }
+  h1{ font-size:30px; line-height:1.25; margin:0 0 14px; letter-spacing:-0.01em; }
+  .byline{ color:var(--muted); font-size:15px; }
+  .byline a{ color:var(--accent); text-decoration:none; }
+  .tag{ display:inline-block; font-size:12px; font-weight:600; letter-spacing:.04em; text-transform:uppercase;
+        color:#fff; background:var(--accent); padding:2px 9px; border-radius:99px; margin-bottom:14px; }
+  h2{ font-size:22px; margin:46px 0 12px; padding-top:8px; letter-spacing:-0.01em; }
+  h3{ font-size:18px; margin:30px 0 8px; color:#222; }
+  h4{ font-size:15px; margin:20px 0 6px; color:#333; font-weight:600; }
+  p,li{ color:#23262b; }
+  a{ color:var(--accent); }
+  .abstract{ background:#f7f9fb; border:1px solid var(--rule); border-left:4px solid var(--accent);
+             border-radius:8px; padding:18px 22px; margin:26px 0 8px; font-size:16px; }
+  .abstract h3{ margin:0 0 8px; font-size:14px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); }
+  .tldr{ background:#fff8e6; border:1px solid #f2e2af; border-radius:8px; padding:14px 20px; margin:22px 0; }
+  table{ border-collapse:collapse; width:100%; margin:18px 0; font-size:14.5px; }
+  th,td{ border-bottom:1px solid var(--rule); padding:8px 10px; text-align:right; }
+  th:first-child,td:first-child{ text-align:left; }
+  thead th{ border-bottom:2px solid #cfd5dc; font-size:13px; color:var(--muted); text-transform:uppercase; letter-spacing:.03em; }
+  tbody tr:hover{ background:#f7f9fb; }
+  .pos{ color:#137a3e; font-variant-numeric:tabular-nums; }
+  .neg{ color:#b3261e; font-variant-numeric:tabular-nums; }
+  td{ font-variant-numeric:tabular-nums; }
+  figure{ margin:26px 0; text-align:center; }
+  figure img{ max-width:100%; border:1px solid var(--rule); border-radius:8px; background:#fff; }
+  figcaption{ color:var(--muted); font-size:13.5px; margin-top:8px; text-align:left; }
+  code{ background:var(--code); padding:1px 5px; border-radius:4px; font-size:14px;
+        font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace; }
+  .key{ font-weight:600; }
+  blockquote{ margin:18px 0; padding:2px 0 2px 18px; border-left:3px solid var(--accent);
+              color:#2a2e34; font-style:italic; }
+  hr{ border:0; border-top:1px solid var(--rule); margin:40px 0; }
+  ol.refs{ font-size:14.5px; color:#33373d; }
+  ol.refs li{ margin:7px 0; }
+  footer{ margin-top:54px; padding-top:18px; border-top:1px solid var(--rule); color:var(--muted); font-size:13.5px; }
+  .nav{ font-size:13.5px; color:var(--muted); margin:18px 0 0; }
+  .nav a{ margin-right:14px; white-space:nowrap; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="title">
+  <div class="tag">Alpha Research · Paper 2</div>
+  <h1>Crypto Carry: The Funding-Rate Cross-Section, Net of Costs and the Liquidation Tail</h1>
+  <p class="byline">
+    <strong>Bryan Vine</strong> · June 16, 2026 ·
+    <a href="https://github.com/bryanvine/alpha-research" target="_blank" rel="noopener">code &amp; full research log ↗</a> ·
+    <a href="index.html">← Alpha Research series</a>
+  </p>
+  <p class="nav">
+    <a href="#abstract">Abstract</a><a href="#intro">1 Introduction</a><a href="#data">2 Data</a><a href="#method">3 Method</a><a href="#results">4 Results</a><a href="#discussion">5 Discussion</a><a href="#limitations">6 Limitations</a><a href="#refs">References</a>
+  </p>
+</header>
+
+<section class="abstract" id="abstract">
+  <h3>Abstract</h3>
+  <p>Perpetual-swap funding is the most-cited &ldquo;carry&rdquo; in crypto, and the trade that famously printed Sharpe ratios above 6. We ask whether it is harvestable net of costs on a clean 2023–2026 panel (30 Binance USD-M perps, 112,853 funding observations) that spans the full 2024 carry boom. We find two sharply different answers. <span class="key">(1) The funding-level harvest (delta-neutral cash-and-carry) is a Sharpe artifact.</span> Its headline Sharpe of 8.5 is an illusion of funding's near-zero volatility; the honest metric is its net return, which is <span class="key">+5.6%/yr and decaying to negative by 2026</span> — it no longer beats T-bills, and its dominant risk (the basis / liquidation / de-peg tail) is not even captured by a funding-only model. <span class="key">(2) The cross-sectional funding-carry factor — dollar-neutral, long low-funding / short high-funding perps — is a real but modest edge,</span> and the first in this research program to survive out-of-sample net of costs: in-sample Sharpe 0.71, <span class="key">purged walk-forward OOS Sharpe 0.39</span> (clearing our +0.3 mean-reversion floor), positive across all 36 configurations (0.58–1.5), robust to dropping any single coin, deflated Sharpe 0.63. The caveats are equally real: a probability of backtest overfitting of 0.81 (the configurations are statistically indistinguishable, so the &ldquo;best&rdquo; one cannot be picked — expect ~0.4, not 1.5), a −35% maximum drawdown, and an edge that comes from relative-value dispersion and crowded-long mean-reversion, <em>not</em> from the decayed funding level. The level carry is dead; the cross-section is alive but thin.</p>
+</section>
+
+<div class="tldr">
+  <strong>One-line takeaway.</strong> The crypto funding <em>level</em> trade is a decayed, tail-dominated, artifact-Sharpe harvest that no longer beats cash — but the <em>cross-sectional</em> funding-carry factor is a genuine, modest, cost-surviving, out-of-sample-positive edge (~0.4 net Sharpe): the program's first.
+</div>
+
+<h2 id="intro">1. Introduction</h2>
+<p>A perpetual swap pins itself to spot via a periodic <span class="key">funding</span> payment between longs and shorts. When funding is persistently positive, longs pay shorts — so a short-perp/long-spot position collects a steady yield, the canonical crypto <em>carry</em> trade <a href="#r1">[1]</a>. Practitioner lore (and many backtests) put its Sharpe above 6. Paper&nbsp;1 of this series found the volatility risk premium real but not harvestable; here we ask the same hard question of carry — <span class="key">is it harvestable net of costs and net of the liquidation tail?</span> — on a panel that, crucially, spans the 2024 boom and the post-ETF compression, so decay is observable.</p>
+<p>We separate two distinct trades that the literature often conflates: the <span class="key">time-series level harvest</span> (collect funding while it is positive) and the <span class="key">cross-sectional factor</span> (bet that high-funding, crowded-long coins underperform low-funding ones). We pre-register falsifiable hypotheses and let the rigor protocol decide:</p>
+<ul>
+  <li><span class="key">H1 (carry signal).</span> Sorting perps by trailing funding and going long-low / short-high (dollar-neutral) earns positive net carry. <em>(Confirmed, modestly.)</em></li>
+  <li><span class="key">H2 (decay).</span> The funding <em>level</em> and the level-harvest return compress across 2023→2026. <em>(Confirmed — to negative by 2026.)</em></li>
+  <li><span class="key">H3 (rigor).</span> Any edge survives deflated Sharpe, PBO, purged walk-forward, and a degenerate-signal check. <em>(The cross-sectional factor survives; the level harvest is exposed as an artifact.)</em></li>
+  <li><span class="key">H5 (prediction).</span> Extreme funding predicts forward returns (crowded longs underperform). <span class="neg"><em>Not significant</em></span> — the edge is the funding spread, not price prediction.</li>
+</ul>
+
+<h2 id="data">2. Data &amp; leakage control</h2>
+<p>We backfilled <span class="key">Binance USD-M perpetual funding for 30 liquid coins, 2023-01 → 2026-05</span> (112,853 funding events, zero gaps), with matched daily spot, from Binance's public data archive. The panel spans the carry boom: cross-sectional median annualized funding ran +7.3% (2023) → <span class="key">+13.4% (2024)</span> → +2.8% (2025) → +0.6% (2026). Two data hazards are handled explicitly:</p>
+<ul>
+  <li><span class="key">MATIC → POL rename (~2024-09).</span> Post-rename, MATIC funding is pinned to the exchange default (constant, zero variance). Our mandatory degenerate-signal check flags exactly this pattern, and we mask MATIC funding after the rename so a constant predictor cannot enter the ranking.</li>
+  <li><span class="key">TIA 4-hour funding.</span> TIA settles funding every 4h (all others 8h); we sum settlements to a daily funding-accrued grid so cadence differences cannot distort the cross-section.</li>
+</ul>
+<p><span class="key">Leakage control.</span> The ranking signal is the trailing funding mean <em>shifted one day</em>, applied to the next day's funding accrual and price return — no contemporaneous information enters the position. Costs are charged on realized turnover at each rebalance.</p>
+
+<h2 id="method">3. Method</h2>
+<p>From the event-level panel we build a daily funding-accrued grid $f_{i,t}$ (sum of a coin's settlements that day) and daily log returns $r_{i,t}$. Because a long perp <em>pays</em> funding when $f&gt;0$ and a short <em>receives</em> it, a portfolio with weights $w$ earns funding PnL $-\sum_i w_{i}f_{i}$.</p>
+<h3>3.1 Two harvests</h3>
+<p><span class="key">Cash-and-carry (level):</span> while a coin's trailing funding exceeds zero, hold long-spot/short-perp and collect funding; equal-weight across qualifying coins, charging a round-trip cost on each entry. <span class="key">Cross-sectional factor:</span> each week, rank coins by trailing-7-day funding, go long the bottom tercile and short the top tercile of <em>perps</em>, dollar-neutral (gross exposure 1.0); daily PnL is the price spread $\sum_i w_i r_i$ plus the funding harvested $-\sum_i w_i f_i$, net of turnover cost. We use spot returns as the perp-price proxy (basis is small for liquid perps) and a realistic <span class="key">6 bp/side</span> taker+slippage cost (swept 0–15 bp).</p>
+<h3>3.2 The rigor gauntlet</h3>
+<p>Every candidate must clear: a degenerate-signal check (run first, always); the deflated Sharpe ratio <a href="#r3">[3]</a> against the expected-max-Sharpe for the number of configurations tried; the probability of backtest overfitting via CSCV <a href="#r4">[4]</a>; purged + embargoed walk-forward; tail-aware metrics (max-drawdown, worst day, skew) rather than Sharpe alone; and the +0.3-Sharpe mean-reversion floor as the practical bar.</p>
+
+<h2 id="results">4. Experiments &amp; results</h2>
+
+<h3>4.1 The funding level decayed — and the level harvest is a Sharpe artifact (H2)</h3>
+<p>The funding level collapsed after 2024 (Figure 1). The delta-neutral cash-and-carry that harvests it posts an absurd Sharpe of 8.5 — but that is an <em>artifact</em>: funding is a near-constant, ultra-low-volatility stream, so the mean/standard-deviation ratio explodes while a funding-only model omits the trade's real risk (basis blow-outs, forced liquidation, stablecoin de-pegs — the Oct-2025 cascade liquidated &ldquo;delta-neutral&rdquo; books industry-wide). The honest metric, net return, tells the real story (Figure 4): <span class="key">+5.6%/yr full-sample, decaying year-by-year to negative in 2026</span> — it no longer beats the ~5% risk-free rate. This is the same smooth-signal trap that, in a prior in-house system, let constant predictors post double-digit backtest Sharpes and then lose money live.</p>
+<figure>
+  <img src="figures/p2_fig1_funding_decay.png" alt="Median annualized funding by year, 2023-2026">
+  <figcaption><strong>Figure 1.</strong> Cross-sectional median annualized funding by year. The 2024 carry boom (+13.4%) has compressed to +0.6% by 2026 — the level edge is largely gone.</figcaption>
+</figure>
+<figure>
+  <img src="figures/p2_fig4_cashcarry.png" alt="Cash-and-carry net annualized return by year">
+  <figcaption><strong>Figure 4.</strong> Cash-and-carry net annualized return by year. The &ldquo;Sharpe-8&rdquo; level harvest falls below cash and turns negative by 2026. Report the return, not the volatility-inflated Sharpe.</figcaption>
+</figure>
+
+<h3>4.2 The cross-sectional factor is a real, modest, out-of-sample edge (H1)</h3>
+<p>Unlike the level, the cross-sectional dispersion in funding is harvestable. Going long low-funding and short high-funding perps, dollar-neutral, earns a net Sharpe of <span class="key">0.71 in-sample</span> (gross 0.90) and — the number that matters — a <span class="key">purged walk-forward OOS Sharpe of 0.39</span>, clearing the +0.3 floor. It is not driven by the funding level (which decayed) but by relative-value dispersion and the mild mean-reversion of crowded longs; it survived the Oct-2025 cascade (+1.7% over the window) because the dollar-neutral structure hedges the market crash. The cost is a real −35% maximum drawdown (Figure 2).</p>
+<figure>
+  <img src="figures/p2_fig2_factor_cumpnl.png" alt="Cumulative net PnL of the cross-sectional funding-carry factor">
+  <figcaption><strong>Figure 2.</strong> Cumulative net PnL of the cross-sectional funding-carry factor (net of 6 bp/side). A −35% drawdown into mid-2024, then a steady net-positive grind through 2025–2026; the Oct-2025 liquidation cascade (shaded) was +1.7%.</figcaption>
+</figure>
+<table>
+  <thead><tr><th>Net Sharpe</th><th>2023</th><th>2024</th><th>2025</th><th>2026*</th><th>Full IS</th><th>Walk-fwd OOS</th></tr></thead>
+  <tbody>
+    <tr><td>Cross-sectional factor</td><td class="neg">−0.57</td><td class="pos">0.45</td><td class="pos">1.17</td><td class="pos">4.26*</td><td class="pos">0.71</td><td class="pos">0.39</td></tr>
+  </tbody>
+</table>
+<p style="font-size:13.5px;color:#5b6470;margin-top:-6px">*2026 is ~5 months (≈20 rebalances) — too short to read as an annualized Sharpe; shown for completeness.</p>
+
+<h3>4.3 Rigor: real but unpickable (H3)</h3>
+<p>The factor passes the gauntlet — with one honest wrinkle. All <span class="key">36 configurations</span> (lookback × quantile × rebalance) are positive (0.58–1.5), it is robust to dropping any single coin (0.54–0.99), and its <span class="key">deflated Sharpe is 0.63</span> (best 0.96). But the <span class="key">probability of backtest overfitting is 0.81</span> — which here does <em>not</em> mean &ldquo;no edge.&rdquo; It means the configurations are statistically <em>indistinguishable</em> (a tight 0.58–1.5 cluster), so the in-sample-best config is no better than a coin-flip out-of-sample. The lesson is precise: there is a real common edge, but you cannot select the 1.5-Sharpe variant and expect it — the honest expectation is the OOS ~0.4 (Figure 3).</p>
+<figure>
+  <img src="figures/p2_fig3_rigor.png" alt="Rigor scorecard: in-sample vs best-config vs walk-forward OOS Sharpe">
+  <figcaption><strong>Figure 3.</strong> In-sample (0.71), best-of-36-configs (1.50), and purged walk-forward OOS (0.39) Sharpe against the +0.3 floor. Deflated Sharpe 0.63 and 36/36 positive configs say the edge is real; PBO 0.81 says the configs are indistinguishable — don't bank on the best one.</figcaption>
+</figure>
+
+<h3>4.4 Funding barely predicts returns (H5)</h3>
+<p>Does extreme funding forecast price? Pooled cross-sectional rank-IC between trailing funding and forward 7-day return is <span class="key">−0.005 (t = −0.89, n = 1,240 days)</span> — correctly signed (crowded longs underperform) but <em>not</em> significant. The factor's edge is the harvested funding spread, not a price forecast; the crowded-long reversal is, at best, a faint tailwind.</p>
+
+<h2 id="discussion">5. Discussion</h2>
+<p>Carry in crypto bifurcates. The <em>level</em> trade — the famous one — is finished as a risk-adjusted edge: the premium has been competed down below cash, its high Sharpe is an artifact of funding's smoothness, and its true risk is a fat left tail that a funding-only backtest never sees. That is the cautionary half.</p>
+<blockquote>The crypto funding level is a decayed, tail-dominated, artifact-Sharpe trade that no longer beats cash; but the cross-sectional funding factor is a genuine, modest, cost-surviving, out-of-sample-positive edge — the first in this program.</blockquote>
+<p>The constructive half: the <em>cross-section</em> of funding still pays a relative-value premium that clears realistic costs out-of-sample (~0.4 Sharpe). It is modest, tail-heavy (−35% drawdown), and its configuration cannot be fine-tuned (PBO 0.81), so it would enter a portfolio sized small and vol-targeted, valued for diversification rather than standalone return. Against Paper&nbsp;1 — a real premium with no tradable edge — this is the mirror image: a thinner premium that <em>is</em> (barely) tradable. Both results were only reachable by refusing the flattering backtest number (the 8.5 and the 1.5) and reporting the honest one (the +5.6% decaying to negative, and the 0.39).</p>
+
+<h2 id="limitations">6. Limitations &amp; future work</h2>
+<p><span class="key">Spot-as-perp proxy.</span> We use spot returns for the perp price leg and a funding-only model for cash-and-carry; we do not have a separate historical perp mark or order book, so we cannot price basis convergence, funding-clamp dynamics, or — most importantly — the forced-liquidation tail that dominates the level trade's real risk. The cash-and-carry Sharpe is reported precisely to <em>expose</em> this gap, not to claim an edge. <span class="key">Single venue, no point-in-time universe.</span> Binance only; the 30-coin set is today's liquid names, so survivorship is imperfect (delisted/zero-funding coins beyond MATIC are not reconstructed). <span class="key">Tail &amp; capacity.</span> The −35% drawdown and the short-leg squeeze risk in crypto mean live sizing must be vol-targeted and small; capacity in the smaller perps is limited. <span class="key">Future work:</span> add a vol-targeted, defined-risk overlay to the cross-sectional factor; reconstruct a point-in-time, survivorship-free universe with delisted coins; and model the liquidation tail explicitly using the Coinalyze open-interest/liquidation series before any live deployment.</p>
+
+<h2 id="refs">References</h2>
+<ol class="refs">
+  <li id="r1">R. Koijen, T. Moskowitz, L. Pedersen &amp; E. Vrugt (2018). &ldquo;Carry.&rdquo; <em>Journal of Financial Economics</em> 127(2).</li>
+  <li id="r2">M. Brunnermeier &amp; L. Pedersen (2009). &ldquo;Market Liquidity and Funding Liquidity.&rdquo; <em>Review of Financial Studies</em> 22(6). (Funding-liquidity spirals and forced deleveraging.)</li>
+  <li id="r3">D. Bailey &amp; M. López de Prado (2014). &ldquo;The Deflated Sharpe Ratio: Correcting for Selection Bias, Backtest Overfitting and Non-Normality.&rdquo; <em>Journal of Portfolio Management</em>.</li>
+  <li id="r4">D. Bailey, J. Borwein, M. López de Prado &amp; Q. Zhu (2017). &ldquo;The Probability of Backtest Overfitting.&rdquo; <em>Journal of Computational Finance</em>.</li>
+  <li id="r5">C. Fieberg et al. (2024). &ldquo;The cross-section of cryptocurrency returns.&rdquo; <em>Journal of Financial and Quantitative Analysis</em> (and related work establishing that short-horizon trend, not size, is the cost-surviving crypto factor).</li>
+  <li id="r6">B. Vine (2026). &ldquo;The Volatility Risk Premium, Cross-Asset.&rdquo; <em>Alpha Research</em>, Paper 1.</li>
+</ol>
+
+<footer>
+  <p>Part of the <a href="index.html">Alpha Research</a> series. Code, configs, figures, and the complete dated research log:
+  <a href="https://github.com/bryanvine/alpha-research" target="_blank" rel="noopener">github.com/bryanvine/alpha-research</a>.
+  All experiments are leak-controlled and reproducible from raw data. © 2026 Bryan Vine.</p>
+</footer>
+
+</div>
+</body>
+</html>
