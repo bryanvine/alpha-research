@@ -81,8 +81,8 @@ def fig4_cashcarry_decay():
                 ha="center", va="bottom" if v >= 0 else "top", fontsize=10)
     ax.axhline(0, color="#444", lw=1.0)
     ax.set_ylabel("net annualized return (%)")
-    ax.set_title("Cash-and-carry: the 'Sharpe-8' level harvest decays below cash, then negative",
-                 loc="left", fontsize=11.5, fontweight="bold")
+    ax.set_title("Cash-and-carry net return: decays below cash, turns negative",
+                 loc="left", fontsize=12, fontweight="bold")
     fig.tight_layout(); fig.savefig(f"{FIG}/p2_fig4_cashcarry.png"); plt.close(fig)
 
 
