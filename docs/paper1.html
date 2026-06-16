@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Volatility Risk Premium, Cross-Asset — Alpha Research</title>
+<meta name="description" content="Is the volatility risk premium harvestable net of costs? A rigorous cross-asset study of crypto (Deribit DVOL) and equity (VIX/PUT/BXM) VRP: a real, robust premium that is fragile, decaying, and not a tradable edge.">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="apple-touch-icon" href="favicon-180.png">
+<meta property="og:type" content="article">
+<meta property="og:title" content="The Volatility Risk Premium, Cross-Asset: Is It Harvestable Net of Costs?">
+<meta property="og:description" content="A real, statistically robust premium — but it halves under realistic vol measurement, has decayed to ~zero since 2024, and (like equity option-writing since 2010) is not a net-of-cost alpha.">
+<meta property="og:url" content="https://bryanvine.github.io/alpha-research/paper1.html">
+<meta property="og:image" content="https://bryanvine.github.io/alpha-research/og-vrp.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<script>
+  MathJax = { tex: { inlineMath: [['$','$']] }, svg: { fontCache: 'global' } };
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+  :root{ --ink:#1a1a1a; --muted:#5b6470; --rule:#e3e6ea; --accent:#1f6feb; --bg:#fdfdfc; --code:#f5f6f8; }
+  *{ box-sizing:border-box; }
+  html{ -webkit-text-size-adjust:100%; }
+  body{ margin:0; background:var(--bg); color:var(--ink);
+        font:17px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif; }
+  .wrap{ max-width:820px; margin:0 auto; padding:48px 22px 96px; }
+  header.title{ border-bottom:3px solid var(--ink); padding-bottom:22px; margin-bottom:8px; }
+  h1{ font-size:30px; line-height:1.25; margin:0 0 14px; letter-spacing:-0.01em; }
+  .byline{ color:var(--muted); font-size:15px; }
+  .byline a{ color:var(--accent); text-decoration:none; }
+  .tag{ display:inline-block; font-size:12px; font-weight:600; letter-spacing:.04em; text-transform:uppercase;
+        color:#fff; background:var(--accent); padding:2px 9px; border-radius:99px; margin-bottom:14px; }
+  h2{ font-size:22px; margin:46px 0 12px; padding-top:8px; letter-spacing:-0.01em; }
+  h3{ font-size:18px; margin:30px 0 8px; color:#222; }
+  h4{ font-size:15px; margin:20px 0 6px; color:#333; font-weight:600; }
+  p,li{ color:#23262b; }
+  a{ color:var(--accent); }
+  .abstract{ background:#f7f9fb; border:1px solid var(--rule); border-left:4px solid var(--accent);
+             border-radius:8px; padding:18px 22px; margin:26px 0 8px; font-size:16px; }
+  .abstract h3{ margin:0 0 8px; font-size:14px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); }
+  .tldr{ background:#fff8e6; border:1px solid #f2e2af; border-radius:8px; padding:14px 20px; margin:22px 0; }
+  table{ border-collapse:collapse; width:100%; margin:18px 0; font-size:14.5px; }
+  th,td{ border-bottom:1px solid var(--rule); padding:8px 10px; text-align:right; }
+  th:first-child,td:first-child{ text-align:left; }
+  thead th{ border-bottom:2px solid #cfd5dc; font-size:13px; color:var(--muted); text-transform:uppercase; letter-spacing:.03em; }
+  tbody tr:hover{ background:#f7f9fb; }
+  .pos{ color:#137a3e; font-variant-numeric:tabular-nums; }
+  .neg{ color:#b3261e; font-variant-numeric:tabular-nums; }
+  td{ font-variant-numeric:tabular-nums; }
+  figure{ margin:26px 0; text-align:center; }
+  figure img{ max-width:100%; border:1px solid var(--rule); border-radius:8px; background:#fff; }
+  figcaption{ color:var(--muted); font-size:13.5px; margin-top:8px; text-align:left; }
+  code{ background:var(--code); padding:1px 5px; border-radius:4px; font-size:14px;
+        font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace; }
+  .key{ font-weight:600; }
+  blockquote{ margin:18px 0; padding:2px 0 2px 18px; border-left:3px solid var(--accent);
+              color:#2a2e34; font-style:italic; }
+  hr{ border:0; border-top:1px solid var(--rule); margin:40px 0; }
+  ol.refs{ font-size:14.5px; color:#33373d; }
+  ol.refs li{ margin:7px 0; }
+  footer{ margin-top:54px; padding-top:18px; border-top:1px solid var(--rule); color:var(--muted); font-size:13.5px; }
+  .nav{ font-size:13.5px; color:var(--muted); margin:18px 0 0; }
+  .nav a{ margin-right:14px; white-space:nowrap; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="title">
+  <div class="tag">Alpha Research · Paper 1</div>
+  <h1>The Volatility Risk Premium, Cross-Asset: Is It Harvestable Net of Costs?</h1>
+  <p class="byline">
+    <strong>Bryan Vine</strong> · June 16, 2026 ·
+    <a href="https://github.com/bryanvine/alpha-research" target="_blank" rel="noopener">code &amp; full research log ↗</a> ·
+    <a href="index.html">← Alpha Research series</a>
+  </p>
+  <p class="nav">
+    <a href="#abstract">Abstract</a><a href="#intro">1 Introduction</a><a href="#data">2 Data</a><a href="#method">3 Method</a><a href="#results">4 Results</a><a href="#discussion">5 Discussion</a><a href="#limitations">6 Limitations</a><a href="#refs">References</a>
+  </p>
+</header>
+
+<section class="abstract" id="abstract">
+  <h3>Abstract</h3>
+  <p>The volatility risk premium (VRP) — option-implied variance minus subsequently realized variance — is one of the most robust facts in asset pricing, and was the one signal that beat its baseline in our prior JEPA study (Deribit DVOL forecast realized vol at IC 0.67 vs 0.55). Here we ask whether it is <em>harvestable net of costs</em>. Using the full Deribit BTC/ETH DVOL history (2021–2026, 12h) and a free equity benchmark (VIX, SPX, Cboe PUT/BXM), we measure the premium and backtest a short-variance-swap harvest through a full rigor gauntlet (deflated Sharpe, PBO via CSCV, purged walk-forward, non-overlapping <em>t</em>-stats, degenerate-signal check). The premium's <em>sign</em> is real and not an overfit (BTC +8.9 vol points, <em>t</em>=4.45, deflated Sharpe 0.88, PBO=0.00; equity +4.1 vp, <em>t</em>=4.22 over 35 years) and it is not merely short spot-beta. But its <em>harvestability</em> is thin and fragile: the headline crypto Sharpe (~1.5) <span class="key">(i)</span> roughly halves for BTC and vanishes/reverses for ETH under range-based (Parkinson/Garman-Klass) realized-vol measurement that better reflects delta-hedged execution; <span class="key">(ii)</span> is concentrated in 2021–2023 and decays to ~0 (BTC) / negative (ETH) by 2024–2026; and <span class="key">(iii)</span> cannot be charged true options-execution costs historically (our surface is a single snapshot). The equity control is the cautionary endpoint: a premium that has persisted 35 years has nonetheless delivered <em>no</em> excess over buy-and-hold since ~2010 (PUT −4.5%/yr, BXM −6.2%/yr, 2020–2026). We conclude the crypto VRP is a genuine risk-compensation premium <em>maturing toward the small, sticky equity level</em> — interesting as a market-maturation signal, not a reliable net-of-cost alpha for a small participant today.</p>
+</section>
+
+<div class="tldr">
+  <strong>One-line takeaway.</strong> The crypto volatility risk premium is real and statistically robust — but it halves or vanishes under realistic volatility measurement, has decayed to ~zero since 2024, and (like equity option-writing since 2010) is not a harvestable net-of-cost alpha. <em>A real premium ≠ a tradable edge.</em>
+</div>
+
+<h2 id="intro">1. Introduction</h2>
+<p>Markets pay a premium to those who sell insurance against volatility: option-implied variance systematically exceeds the variance that subsequently realizes. This <span class="key">variance risk premium</span> is among the best-documented anomalies in finance <a href="#r1">[1]</a><a href="#r2">[2]</a>, and in our prior work it was the <em>only</em> signal that beat a trivial baseline — Deribit's DVOL index forecast realized volatility at rank-IC 0.67 versus 0.55 for a trailing-realized-vol forecast <a href="#r8">[8]</a>. That was a <em>forecasting</em> result. This paper asks the harder, money question: <span class="key">is the premium harvestable net of costs?</span> — and benchmarks crypto against the mature equity market to see whether crypto's premium is special or simply a younger, larger version of a fading friction.</p>
+<p>This matters because a positive premium and a tradable edge are different things. A variance seller earns the premium in calm periods and pays it back violently in crashes; the relevant question is whether the compensation survives realistic execution and whether it persists. We pre-register falsifiable hypotheses and explicit kill criteria, and we let the rigor protocol — not a flattering backtest — decide:</p>
+<ul>
+  <li><span class="key">H1 (sign).</span> Implied variance (DVOL²) exceeds subsequent realized variance for BTC and ETH, with a non-overlapping <em>t</em> &gt; 3. <em>(Confirmed for BTC; marginal for ETH.)</em></li>
+  <li><span class="key">H2 (harvest).</span> A regime-gated, vol-targeted short-variance-swap harvest beats both the +0.3-Sharpe mean-reversion floor and a passive always-on baseline, net of a realistic cost. <em>(Confirmed full-sample; fails in the live regime.)</em></li>
+  <li><span class="key">H3 (not an artifact).</span> The harvest is not short spot-beta and not a selection/overfitting artifact (deflated Sharpe &gt; 0.5, PBO &lt; 0.5). <em>(Confirmed.)</em></li>
+  <li><span class="key">H4 (robustness).</span> The premium is robust to the realized-volatility estimator. <span class="neg"><em>Falsified</em></span> — and that falsification is a central result.</li>
+  <li><span class="key">H5 (stability).</span> The premium is stable over time. <span class="neg"><em>Falsified</em></span> — it decays sharply.</li>
+  <li><span class="key">H6 (cross-asset).</span> Where the equity VRP persists, option-writing harvests it net of costs. <span class="neg"><em>Falsified</em></span> — no excess over buy-and-hold since ~2010.</li>
+</ul>
+
+<h2 id="data">2. Data &amp; leakage control</h2>
+<p>All data are free and verified on disk. The crypto harvest runs entirely off the implied/realized comparison; the option surface is used only as context (see Limitations).</p>
+<ul>
+  <li><span class="key">Crypto — Deribit DVOL &amp; index price.</span> 30-day model-free implied-vol index and OHLCV index price for BTC and ETH, 12h bars, <span class="key">2021-03-24 → 2026-06-16, 3,822 bars each, zero gaps</span> (≈62 non-overlapping 30-day windows). DVOL is the risk-neutral leg; realized variance is built from the price series.</li>
+  <li><span class="key">Equity — VIX, SPX, Cboe writing indices.</span> VIX (FRED, 1990–), SPX daily closes (Yahoo ^GSPC, validated against FRED SP500 to 1e-4), and the Cboe PUT/BXM/BXMD/WPUT/PPUT total-return option-writing indices — the traded benchmarks whose returns already embed the writing mechanics.</li>
+</ul>
+<p><span class="key">Leakage control is treated as a first-class concern.</span> The implied leg is the DVOL value known <em>at or before</em> each decision bar (a backward as-of join); the regime gate uses only <em>trailing</em> realized volatility; the variance-swap payoff uses realized variance over the <em>forward</em> 30 days, which is the trade resolving — not look-ahead. Significance is computed on <em>non-overlapping</em> windows (and Newey-West for the overlapping series), so overlapping labels cannot inflate <em>t</em>-stats.</p>
+
+<h2 id="method">3. Method</h2>
+<p>We define the premium in annualized variance units at each bar $t$,</p>
+<p>$$\mathrm{VRP}_t \;=\; \big(\mathrm{DVOL}_t/100\big)^2 \;-\; \mathrm{RV}_{t\to t+30\mathrm{d}},$$</p>
+<p>where $\mathrm{RV}$ is annualized realized variance over the forward 30 days. We report it both in variance units and in vol points ($\mathrm{DVOL}/100-\sqrt{\mathrm{RV}}$). <span class="key">A short variance swap</span> entered at $t$ has PnL $(\mathrm{DVOL}_t/100-c)^2-\mathrm{RV}$, where $c$ is a round-trip cost in vol points; this is the canonical VRP harvester (DVOL is, like VIX, a fair variance-swap strike).</p>
+<h3>3.1 Strategies and the realized-vol estimator</h3>
+<p>We backtest <span class="key">passive</span> (always short) versus <span class="key">gated</span> (sell only when implied &gt; trailing realized — positive ex-ante carry) versus <span class="key">gated + vol-targeted</span> (inverse-vol, ≈constant-vega sizing), on non-overlapping 30-day windows, for BTC and ETH separately (we do not pool — the two premia diverge). Crucially, we measure $\mathrm{RV}$ three ways: close-to-close, Parkinson, and Garman-Klass. A variance swap <em>settles</em> on close-to-close variance, but a delta-hedged option harvest — the only realistic way to trade crypto vol on Deribit — realizes the <em>path</em> variance, which the range-based estimators proxy better.</p>
+<h3>3.2 Evaluation — the rigor gauntlet</h3>
+<p>Every claim must clear: a non-overlapping <em>t</em>-stat with hurdle |<em>t</em>|&gt;3; the <span class="key">deflated Sharpe ratio</span> <a href="#r5">[5]</a> against the expected maximum Sharpe under the null for the number of configurations tried; <span class="key">PBO via CSCV</span> <a href="#r6">[6]</a> &lt; 0.5; purged + embargoed walk-forward; a <span class="key">degenerate-signal check</span> (a prior in-house system lost money when 67% of its &ldquo;winners&rdquo; were constant predictors gaming a diversity-blind backtester); tail-aware metrics (skew, kurtosis, CVaR, max-drawdown) rather than Sharpe alone; and benchmarks against the trivial baselines and the <span class="key">+0.3-Sharpe mean-reversion floor</span> — the only edge that survived our prior equity work.</p>
+
+<h2 id="results">4. Experiments &amp; results</h2>
+
+<h3>4.1 The premium is real (H1) — and not just short beta (H3)</h3>
+<p>Implied volatility runs visibly above realized for both assets (Figure 1). BTC's premium is large and significant; ETH's is smaller and marginal on the <em>t</em>&gt;3 bar. The harvest is essentially uncorrelated with spot direction (corr to forward spot return +0.12 BTC, +0.17 ETH) — it is a volatility trade, not disguised long/short beta.</p>
+<figure>
+  <img src="figures/fig1_implied_vs_realized.png" alt="Implied (DVOL) vs forward realized volatility for BTC and ETH, 2021-2026">
+  <figcaption><strong>Figure 1.</strong> Implied (DVOL, 30d) sits above forward 30-day realized volatility for both BTC and ETH across 2021–2026; the shaded gap is the premium. Note the steady compression of <em>both</em> series toward ~40–50% as the market matures.</figcaption>
+</figure>
+<table>
+  <thead><tr><th>Asset</th><th>VRP (vol pts)</th><th>% positive</th><th>non-overlap <em>t</em></th><th>Newey-West <em>t</em></th><th>corr to spot</th></tr></thead>
+  <tbody>
+    <tr><td>BTC</td><td class="pos">+8.90</td><td>74%</td><td class="pos">4.45</td><td class="pos">5.18</td><td>+0.12</td></tr>
+    <tr><td>ETH</td><td class="pos">+6.06</td><td>67%</td><td>2.14</td><td>1.89</td><td>+0.17</td></tr>
+    <tr><td>Equity (SPX/VIX)</td><td class="pos">+4.09</td><td>86%</td><td class="pos">4.22</td><td>—</td><td>—</td></tr>
+  </tbody>
+</table>
+
+<h3>4.2 Fragility to the realized-vol estimator (H4 falsified)</h3>
+<p>This is the pivotal finding. The premium's magnitude — and the harvest Sharpe — depend heavily on <em>how</em> realized volatility is measured. Under close-to-close (the variance-swap convention) the BTC premium is +8.9 vp; under the range-based Parkinson and Garman-Klass estimators (which better reflect the path volatility a delta-hedge actually realizes) it falls to +4.6 and +3.1 vp, and the harvest Sharpe collapses from 1.53 to ~0. <span class="key">For ETH the premium vanishes and reverses</span> (Figure 2, Table). The generous close-to-close framing is a researcher degree-of-freedom; the harvest-relevant number is much thinner.</p>
+<figure>
+  <img src="figures/fig2_rv_estimator_fragility.png" alt="VRP magnitude and harvest Sharpe under three realized-vol estimators">
+  <figcaption><strong>Figure 2.</strong> The premium and its harvest Sharpe under close-to-close, Parkinson, and Garman-Klass realized variance. The BTC edge roughly halves; the ETH edge disappears. Range/path-based measurement — closer to what a delta-hedged harvest realizes — is the honest case.</figcaption>
+</figure>
+<table>
+  <thead><tr><th>RV estimator</th><th>BTC VRP (vp)</th><th>BTC harvest SR</th><th>ETH VRP (vp)</th><th>ETH harvest SR</th></tr></thead>
+  <tbody>
+    <tr><td>Close-to-close</td><td class="pos">+8.90</td><td class="pos">1.53</td><td class="pos">+6.06</td><td class="pos">1.02</td></tr>
+    <tr><td>Parkinson</td><td class="pos">+4.59</td><td>0.42</td><td>+0.63</td><td>0.14</td></tr>
+    <tr><td>Garman-Klass</td><td>+3.10</td><td class="neg">−0.04</td><td class="neg">−1.24</td><td class="neg">−0.10</td></tr>
+  </tbody>
+</table>
+
+<h3>4.3 Not an overfit — but a decaying one (H3 confirmed, H5 falsified)</h3>
+<p>Full-sample, over a grid of 60 configurations (estimator × gate × vol-target × cost), the best crypto config posts a <span class="key">deflated Sharpe of 0.88 (BTC) and 0.55 (ETH)</span> with <span class="key">PBO = 0.00</span>: the premium's sign is statistically real, not a selection artifact. Phase robustness confirms it (BTC Sharpe mean 1.18 across all 60 entry phases). But the edge is not stable — it is concentrated in 2021–2023 and decays to nothing in the live regime (Figure 3). Split-sample Sharpe falls from <span class="pos">2.82</span> to <span class="neg">0.27</span> for BTC and from <span class="pos">1.94</span> to <span class="neg">−0.13</span> for ETH; by 2025 both are at or below zero. This trips our pre-registered kill criterion: <em>the premium has been arbitraged toward zero in our live window.</em></p>
+<figure>
+  <img src="figures/fig3_decay_cumulative_pnl.png" alt="Cumulative harvest PnL for BTC and ETH, flat after 2024">
+  <figcaption><strong>Figure 3.</strong> Cumulative short-variance-swap harvest PnL (gated + vol-targeted, net 2 vol points). Nearly all gains accrue in 2021–2023; the shaded 2024–2026 &ldquo;live regime&rdquo; is flat-to-down (annualized Sharpe ≈ 0).</figcaption>
+</figure>
+<table>
+  <thead><tr><th>Asset</th><th>Sharpe 2021–23</th><th>Sharpe 2024–26</th><th>deflated Sharpe (full)</th><th>PBO</th></tr></thead>
+  <tbody>
+    <tr><td>BTC</td><td class="pos">2.82</td><td>0.27</td><td class="pos">0.88</td><td class="pos">0.00</td></tr>
+    <tr><td>ETH</td><td class="pos">1.94</td><td class="neg">−0.13</td><td>0.55</td><td class="pos">0.00</td></tr>
+  </tbody>
+</table>
+
+<h3>4.4 The equity control: a 35-year premium with no tradable alpha since 2010 (H6 falsified)</h3>
+<p>The equity VRP is real and remarkably persistent — +4.1 vol points, 86% of days positive, <em>t</em>=4.22 over 1990–2026, declining only mildly post-2010 (a 0.85 ratio vs a crypto collapse). Yet harvesting it has produced <em>no</em> excess over simply holding the S&amp;P since ~2010: the classic PutWrite (PUT) and BuyWrite (BXM) indices <em>under</em>perform buy-and-hold by 4–6%/yr in 2020–2026 (Figure 5), consistent with the literature's finding that traded-option alpha converged to zero as intermediary frictions fell <a href="#r4">[4]</a>. The premium persists; the alpha does not. And the crypto premium is visibly converging toward this small, sticky equity level (Figure 4).</p>
+<figure>
+  <img src="figures/fig4_crypto_vs_equity.png" alt="Early vs late VRP for BTC, ETH and equity">
+  <figcaption><strong>Figure 4.</strong> Early-vs-late VRP magnitude. The equity premium barely moves over 35 years (4.4 → 3.7 vp); the crypto premium collapses (BTC 13.2 → 3.4, ETH 11.4 → 0.2 vp) toward that same sticky level — a market pricing out its volatility-insurance premium in real time.</figcaption>
+</figure>
+<figure>
+  <img src="figures/fig5_equity_dead_net.png" alt="Equity option-writing excess return over the S&P 500, 2020-2026">
+  <figcaption><strong>Figure 5.</strong> Excess annualized return of Cboe option-writing indices over the S&amp;P 500, 2020–2026. Every standard writing strategy lags buy-and-hold — the &ldquo;dead net&rdquo; control. (Standalone Sharpes are 0.5–0.9; they are long-equity-beta products, but they harvest no alpha over the index.)</figcaption>
+</figure>
+
+<h2 id="discussion">5. Discussion</h2>
+<p>The results reconcile a paradox: the VRP is one of the most reliable <em>signs</em> in finance, yet a poor <em>trade</em>. The sign is real (BTC <em>t</em>=4.45, equity <em>t</em>=4.22, both surviving deflation), but harvesting it is a different question, and three independent forces shrink the edge to the margin:</p>
+<blockquote>The crypto volatility risk premium is a genuine risk-compensation premium that is maturing toward the small, sticky level equities have sustained for 35 years — interesting as a market-maturation signal, but not a reliable net-of-cost alpha for a small participant today.</blockquote>
+<p>First, <span class="key">measurement</span>: the headline relies on close-to-close realized variance; under the path-aware estimators relevant to a delta-hedged harvest the BTC edge halves and the ETH edge disappears. Second, <span class="key">decay</span>: nearly all harvest PnL accrued in 2021–2023; the live regime is flat. Third, <span class="key">the equity mirror</span>: even where the premium has persisted for decades, the tradable harvest has beaten nothing since 2010. The natural reading is that crypto in 2021–2022 was an immature market richly paying for volatility insurance, and that premium has been competed down as the market institutionalized (ETFs, more sophisticated vol sellers) — exactly the trajectory the equity control predicts. None of this is rescued by more compute or a bigger model; the ceiling is the (shrinking) signal.</p>
+
+<h2 id="limitations">6. Limitations &amp; future work</h2>
+<p><span class="key">No historical option surface → cost is calibrated, not pathwise.</span> Our Deribit surface is a single end-of-sample snapshot, so we cannot price the full options-execution leg (bid-ask by moneyness/tenor, delta-hedge slippage) at each point historically. We model cost as a round-trip vol-point haircut and report a 0–5 vp sweep; a live calibration anchors it — the current at-the-money Deribit half-spread is ~2.7–3.9% of premium, i.e. <span class="key">≈2.7 vol points round-trip</span> for both BTC and ETH, validating the 2 vp default — but the out-of-the-money wings of a true variance-swap strip run several percent of premium and would push the (already thin) recent-regime edge further negative. We have begun collecting the Deribit surface forward (periodic bid/ask snapshots) for a genuine historical execution backtest. <span class="key">Realized-vol measurement is itself a degree of freedom.</span> Beyond the estimator (Fig 2), the premium is sensitive to the data <em>source</em>: a 1h cross-check is confounded by exchange (Kraken spot 1h vs Deribit index 12h) and actually yields a <em>higher</em> recent-regime VRP, whereas same-source 12h close-to-close gives a slightly negative one — in the live regime the premium is thin enough that its sign depends on how realized volatility is measured. That is precisely the point; a clean same-source high-frequency test (pre-2024 HF data is unavailable) awaits the forward-collected surface. <span class="key">Sample.</span> 62 non-overlapping windows is thin, and our gate lacks a true term-structure/contango input (no historical surface) — both bias us toward the simplest defensible harvest. <span class="key">Scope.</span> We test BTC and ETH; the smaller-cap, higher-VRP alts (and the term structure, skew, and dispersion dimensions) are left for follow-on work, as is the open question of whether a defined-risk, options-execution-aware structure can monetize the residual premium net of real spreads.</p>
+
+<h2 id="refs">References</h2>
+<ol class="refs">
+  <li id="r1">T. Bollerslev, G. Tauchen &amp; H. Zhou (2009). &ldquo;Expected Stock Returns and Variance Risk Premia.&rdquo; <em>Review of Financial Studies</em> 22(11).</li>
+  <li id="r2">P. Carr &amp; L. Wu (2009). &ldquo;Variance Risk Premiums.&rdquo; <em>Review of Financial Studies</em> 22(3).</li>
+  <li id="r3">I. Dew-Becker, S. Giglio, A. Le &amp; M. Rodriguez (2017). &ldquo;The Price of Variance Risk.&rdquo; <em>Journal of Financial Economics</em> 123(2).</li>
+  <li id="r4">I. Dew-Becker &amp; S. Giglio (2025). &ldquo;The Decline of the Variance Risk Premium: Evidence from Traded and Synthetic Options.&rdquo; Federal Reserve Bank of Chicago WP 2025-17.</li>
+  <li id="r5">D. Bailey &amp; M. López de Prado (2014). &ldquo;The Deflated Sharpe Ratio: Correcting for Selection Bias, Backtest Overfitting and Non-Normality.&rdquo; <em>Journal of Portfolio Management</em>.</li>
+  <li id="r6">D. Bailey, J. Borwein, M. López de Prado &amp; Q. Zhu (2017). &ldquo;The Probability of Backtest Overfitting.&rdquo; <em>Journal of Computational Finance</em>.</li>
+  <li id="r7">Deribit (2021). &ldquo;DVOL — Deribit Implied Volatility Index: Methodology.&rdquo;</li>
+  <li id="r8">B. Vine (2026). &ldquo;Does JEPA Find Alpha?&rdquo; <em>Alpha Research</em> (jepa-trader series), Paper 3: Beyond Price.</li>
+</ol>
+
+<footer>
+  <p>Part of the <a href="index.html">Alpha Research</a> series. Code, configs, figures, and the complete dated research log:
+  <a href="https://github.com/bryanvine/alpha-research" target="_blank" rel="noopener">github.com/bryanvine/alpha-research</a>.
+  All experiments are leak-controlled and reproducible from raw data. © 2026 Bryan Vine.</p>
+</footer>
+
+</div>
+</body>
+</html>

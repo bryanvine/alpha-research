@@ -1,0 +1,50 @@
+# ---- datasets & experiment outputs (regenerated from raw sources) ----
+# Ignore the CONTENTS, not the directory itself, so the .gitkeep below is
+# re-includable (git can't un-ignore a file under a fully-ignored directory).
+/data/*
+/experiments/*
+!/data/.gitkeep
+!/experiments/.gitkeep
+
+# ---- model / array binaries ----
+*.pt
+*.ckpt
+*.parquet
+*.h5
+*.npz
+
+# ---- large tabular dumps (track small docs CSVs by exception below) ----
+*.csv
+
+# ---- secrets ----
+.env
+.env.*
+
+# ---- python ----
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+venv/
+*.egg-info/
+.eggs/
+.pytest_cache/
+.ipynb_checkpoints/
+
+# ---- OS / editor cruft ----
+.DS_Store
+
+# ============================================================
+# Exceptions — DO track these even though rules above match.
+# ============================================================
+!.gitkeep
+!**/.gitkeep
+# keep everything under docs/, configs/, research/, papers/ (code, html, yaml, md)
+!docs/**
+!configs/**
+!research/**
+!papers/**
+# never ignore markdown anywhere
+!*.md
+!**/*.md

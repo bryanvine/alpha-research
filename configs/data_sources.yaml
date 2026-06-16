@@ -1,0 +1,177 @@
+# =============================================================================
+# alpha-research — data sources registry
+# -----------------------------------------------------------------------------
+# Where existing datasets live so future scripts can find them. Paths and sizes
+# were verified on 2026-06-16 (host: this machine). Rows/sizes are approximate
+# and from cheap checks (file headers, parquet metadata, du -sh); re-verify
+# before relying on exact counts.
+#
+# SECRETS POLICY: this file NEVER contains credentials. The `api_keys` block at
+# the bottom names the SERVICE and the .env FILE only — look the value up there.
+# =============================================================================
+
+databases:
+  crypto_timescaledb:
+    kind: timescaledb
+    note: "VERIFIED 2026-06-16. Container 'crypto-timescaledb' listens on port 12432 INSIDE the container; NOT published to host (host localhost:12432 refused, no psql client). Reach via: docker exec crypto-timescaledb sh -lc 'PGPASSWORD=$POSTGRES_PASSWORD psql -h 127.0.0.1 -p 12432 -U trading -d crypto'. db=crypto user=trading (pw in container env POSTGRES_PASSWORD)."
+    host: localhost
+    port: 12432
+    access: docker_exec   # not host-reachable; port not published
+    status: verified
+    contents: "Tables: bars (5.67M rows; cols time,symbol,exchange,timeframe,OHLCV; tf 15m/1h/4h/1d; exch binance/hyperliquid/aggregated/kraken), binance_derivatives_data, coinalyze_data, coinglass_history, fear_greed, equity_snapshots, crypto_news/sentiment, hl_market_data, backtest_results."
+    note_paper1: "BTC-USD/ETH-USD bars: deepest is 15m-binance from 2024-03-07; 1h/4h/1d only from 2025-01-30. Does NOT reach 2021 -> not usable for full-span RV (use deribit_vol price_*.parquet @12h instead)."
+  trading_timescaledb:
+    kind: timescaledb
+    note: "VERIFY CONNECTION — container/port ~16432 (equities trading stack)."
+    host: localhost
+    port: 16432
+    status: verify_connection
+    contents: "equities bars, LOB-derived features, IBKR paper-trading stack."
+
+datasets:
+
+  # ---- Volatility / options (Paper #1 lead) -------------------------------
+  deribit_vol:
+    path: /apps/jepa-trader/data/raw_deribit/
+    verified: true   # re-verified 2026-06-16 via scripts/profile_deribit.py
+    size: ~884K
+    files: 7
+    contents:
+      - "dvol_{BTC,ETH}.parquet — Deribit DVOL 30d implied-vol index; 3822 rows each (12h bars), 2021-03-24 00:00 .. 2026-06-16 12:00 UTC; zero gaps/dups/NaN. cols: ts(int64 ms),dvol_o/h/l/c,time(dt). DVOL pts: BTC 32-168, ETH 30-206."
+      - "price_{BTC,ETH}.parquet — Deribit INDEX price OHLCV; 3822 rows each, 2021-03-23 20:00 .. 2026-06-16 08:00 UTC @ 12h, zero gaps. cols: ts,open,high,low,close,volume,time. THE ONLY realized-vol source covering the full DVOL window (use for 30d RV; OHLC -> GK/Parkinson)."
+      - "surface_{BTC,ETH}.json — SINGLE END-OF-SAMPLE SNAPSHOT (not a time series): {currency,index,n,options[]}; BTC 932 / ETH 762 contracts; fields instrument,exp,strike,cp,mark_iv,moneyness; NO timestamp; all expiries future (2026-06-17..2027-03-26). Cannot price options-execution leg historically -> see paper1_data_profile.md Blocker #1."
+      - "summary.json — per-coin row counts / ranges / spot index."
+    used_for: "Paper #1 — The Volatility Risk Premium, Cross-Asset."
+    profile: /apps/alpha-research/research/paper1_data_profile.md
+
+  # ---- Equity VRP benchmark (Paper #1 cross-asset H6) ---------------------
+  equity_vol:
+    path: /apps/alpha-research/data/equity_vol/
+    verified: true   # downloaded & spans verified 2026-06-16; daily EOD, no API key
+    used_for: "Paper #1 — cross-asset equity VRP benchmark ('equity VRP ~dead net'): VIX-vs-realized spreads + CBOE option-writing total-return indices."
+    note: "All series run through 2026-06-15, overlapping the crypto DVOL window (2021-03-24+). No equity option SURFACE/per-strike data here — indices only."
+    sources:
+      fred:
+        base_url: "https://fred.stlouisfed.org/graph/fredgraph.csv?id=<ID>"
+        cols: "observation_date,<ID>"
+        files:
+          - "vixcls.csv        — VIXCLS  (VIX 30d)            1990-01-02..2026-06-15, 9510 rows"
+          - "vxvcls.csv        — VXVCLS  (VIX 3-month)        2007-12-04..2026-06-15, 4835 rows"
+          - "fred_VXDCLS.csv   — VXD     (DJIA vol)           1997-10-07..2026-06-15, 7486 rows"
+          - "fred_VXNCLS.csv   — VXN     (Nasdaq-100 vol)     2001-02-02..2026-06-15, 6618 rows"
+          - "fred_VXOCLS.csv   — VXO     (old S&P100 vol)     1986-01-02..2021-09-23, 9321 rows (discontinued)"
+          - "fred_OVXCLS.csv   — OVX     (crude-oil VIX)      2007-05-10..2026-06-15, 4983 rows"
+          - "fred_GVZCLS.csv   — GVZ     (gold VIX)           2008-06-03..2026-06-15, 4705 rows"
+          - "fred_EVZCLS.csv   — EVZ     (EUR/USD VIX)        2007-11-01..2025-03-11, 4529 rows"
+          - "fred_VXTYN.csv    — VXTYN   (10y T-note vol)     2003-01-02..2020-05-15, 4532 rows (discontinued)"
+        note: "FRED has no VIX9D/VIX6M/VVIX/SKEW ids (404) — those are from Cboe below."
+      cboe_cdn:
+        base_url: "https://cdn.cboe.com/api/global/us_indices/daily_prices/<SYM>_History.csv"
+        cols: "DATE,[OPEN,HIGH,LOW,]CLOSE | DATE,<SYM>"
+        files:
+          - "cboe_VIX.csv   — VIX     OHLC  1990-01-02..2026-06-15, 9207 rows"
+          - "cboe_VIX9D.csv — VIX9D   OHLC  2011-01-04..2026-06-15, 3884 rows"
+          - "cboe_VIX3M.csv — VIX3M   OHLC  2009-09-18..2026-06-15, 4210 rows"
+          - "cboe_VIX6M.csv — VIX6M   OHLC  2008-01-02..2026-06-15, 4642 rows"
+          - "cboe_VVIX.csv  — VVIX          2006-03-06..2026-06-15, 5041 rows"
+          - "cboe_SKEW.csv  — SKEW          1990-01-02..2026-06-15, 9164 rows"
+          - "cboe_PUT.csv   — PUT  (S&P500 PutWrite)        1991-03-04..2026-06-15, 4900 rows"
+          - "cboe_BXM.csv   — BXM  (S&P500 BuyWrite)        2002-03-22..2026-06-15, 6094 rows"
+          - "cboe_BXMD.csv  — BXMD (BuyWrite 30-delta)      1986-06-20..2026-06-15, 10068 rows"
+          - "cboe_WPUT.csv  — WPUT (Weekly PutWrite)        2006-01-31..2026-06-15, 5122 rows"
+          - "cboe_PPUT.csv  — PPUT (5% Put-Protection)      1986-06-30..2026-06-15, 10062 rows"
+
+  # ---- Crypto bars --------------------------------------------------------
+  crypto_bars_jepa:
+    path: /apps/jepa-trader/data/raw_crypto/
+    verified: true
+    size: ~65M
+    files: 1
+    contents:
+      - "bars_1h.csv — top-50 coins, 1h OHLCV; 1,034,985 rows. cols: time,symbol,open,high,low,close,volume. BTC-USD/ETH-USD slices: 14,588 rows, 2025-01-30 08:00 .. 2026-06-16 03:00 UTC (does NOT reach 2021 -> not usable for full-span RV)."
+    used_for: "Crypto carry / stat-arb / directional audit."
+  crypto_data_cryptotrader:
+    path: /apps/crypto-trader/data/
+    verified: true
+    size: ~184M
+    files: ~310
+    contents:
+      - "historical/ — Kraken OHLCV CSVs at 1h/4h/1d for ~10 majors (30 files; e.g. BTCUSD_1h_kraken.csv)."
+      - "exec_lab/, live_policy_backtest_report*.json, ml_prod_* — live/sim execution logs (reference, not training data)."
+    note: "Also holds DB backups (*.sql.gz) and Coinglass backfill progress."
+    used_for: "Crypto carry / stat-arb; execution-cost reference."
+
+  # ---- Funding history ----------------------------------------------------
+  crypto_funding_history:
+    path: /apps/crypto-trader/data/funding_history/
+    verified: true
+    size: ~134M
+    files: 228   # 228 perpetuals, one CSV each (<COIN>_funding.csv)
+    contents:
+      - "<COIN>_funding.csv — perpetual funding-rate history; cols: timestamp_ms,coin,funding_rate,premium."
+      - "~20k-23k hourly rows per perp (e.g. ADA = 20,046 rows)."
+    scale: "228 perps x ~23k hours."
+    used_for: "Paper #2 — Crypto Carry: the funding-rate cross-section."
+
+  # ---- Fundamentals / sentiment ------------------------------------------
+  fnspid:
+    path: /apps/jepa-trader/data/raw_fnspid/
+    verified: true
+    size: ~9.0G
+    files: ~7697
+    contents:
+      - "sentiment_panel.parquet — daily (symbol,date) FinBERT sentiment panel; 1,891,459 rows. cols: date,sym,sent,n_articles."
+      - "prices_panel.parquet — adjusted prices + fwd returns; 10,782,976 rows. cols: date,adj,sym,fret_1d,fret_3d,fret_5d."
+      - "All_external.csv (~5.7G), full_history/ + full_history.zip — raw FNSPID news corpus."
+    used_for: "Directional audit (sentiment), fundamentals features."
+
+  # ---- Equities LOB / microstructure -------------------------------------
+  equities_lob_training:
+    path: /apps/trading-system/data/training/
+    verified: true
+    size: ~4.6G
+    files: 32
+    contents:
+      - "lob_YYYYMMDD.parquet — 10-level SPY/QQQ LOB snapshots; 42 cols (bid/ask price+size x10 + meta)."
+      - "~578k rows/day; ~tens of millions total (project ref: ~56M SPY/QQQ snapshots)."
+    used_for: "Paper #5 — Liquidity Provision as Alpha."
+  equities_databento_l2:
+    path: /apps/trading-system/data/databento/
+    verified: true
+    size: ~56G
+    files: ~297
+    contents:
+      - "XNAS-YYYYMMDD-* / — Databento Nasdaq feeds; *.mbp-10.dbn.zst (L2 market-by-price 10) + metadata/symbology JSON."
+    used_for: "Paper #5 — high-fidelity L2 microstructure / execution alpha."
+
+  # ---- TO SOURCE (not yet acquired) --------------------------------------
+  fx_spot_forward_rates:
+    path: null
+    status: TODO
+    note: "FX spot + forward points + short-rate differentials. NOT YET SOURCED."
+    used_for: "Paper #6 — FX Carry."
+  commodity_futures_term_structure:
+    path: null
+    status: TODO
+    note: "Commodity futures curves (front/back, roll yield). NOT YET SOURCED."
+    used_for: "Paper #6 — Commodity Roll Yield."
+  equity_options_vix:
+    path: null
+    status: PARTIAL   # VIX + term-structure + writing-index portion DONE -> see datasets.equity_vol
+    note: "VIX/term-structure/skew + CBOE option-writing total-return indices acquired 2026-06-16 (see datasets.equity_vol). STILL NOT SOURCED: equity index-option SURFACE / per-strike quotes (needed only for apples-to-apples options-execution-cost parity vs Deribit)."
+    used_for: "Paper #1 — cross-asset extension of the vol-risk-premium to equities."
+
+# =============================================================================
+# API keys — SERVICE NAMES ONLY. Values live in the named .env (never copied).
+# =============================================================================
+api_keys:
+  "/apps/trading-system/.env":
+    - IBKR        # Interactive Brokers
+    - Databento
+  "/apps/crypto-trader/.env":
+    - Coinbase
+    - Kraken
+    - Binance
+    - Hyperliquid
+    - CoinGlass
+    - Coinalyze

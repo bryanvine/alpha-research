@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<!--
+  alpha-research paper template.
+  Shared scaffold extracted from jepa-trader/docs (index.html + paper3.html):
+  full CSS block, MathJax CDN include, Open Graph + Twitter card meta, favicon
+  links, and the academic section structure. All prose is replaced by
+  {{PLACEHOLDER}} tokens — fill them in per paper (and delete sections you don't
+  need). Figures go in docs/figures/ and are referenced as figures/<name>.png.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{TITLE}}</title>
+<meta name="description" content="{{META_DESCRIPTION}}">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="apple-touch-icon" href="favicon-180.png">
+<meta property="og:type" content="article">
+<meta property="og:title" content="{{OG_TITLE}}">
+<meta property="og:description" content="{{OG_DESCRIPTION}}">
+<meta property="og:url" content="{{OG_URL}}">
+<meta property="og:image" content="{{OG_IMAGE_URL}}">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<script>
+  MathJax = { tex: { inlineMath: [['$','$']] }, svg: { fontCache: 'global' } };
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+  :root{ --ink:#1a1a1a; --muted:#5b6470; --rule:#e3e6ea; --accent:#1f6feb; --bg:#fdfdfc; --code:#f5f6f8; }
+  *{ box-sizing:border-box; }
+  html{ -webkit-text-size-adjust:100%; }
+  body{ margin:0; background:var(--bg); color:var(--ink);
+        font:17px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif; }
+  .wrap{ max-width:820px; margin:0 auto; padding:48px 22px 96px; }
+  header.title{ border-bottom:3px solid var(--ink); padding-bottom:22px; margin-bottom:8px; }
+  h1{ font-size:30px; line-height:1.25; margin:0 0 14px; letter-spacing:-0.01em; }
+  .byline{ color:var(--muted); font-size:15px; }
+  .byline a{ color:var(--accent); text-decoration:none; }
+  .tag{ display:inline-block; font-size:12px; font-weight:600; letter-spacing:.04em; text-transform:uppercase;
+        color:#fff; background:var(--accent); padding:2px 9px; border-radius:99px; margin-bottom:14px; }
+  h2{ font-size:22px; margin:46px 0 12px; padding-top:8px; letter-spacing:-0.01em; }
+  h3{ font-size:18px; margin:30px 0 8px; color:#222; }
+  h4{ font-size:15px; margin:20px 0 6px; color:#333; font-weight:600; }
+  p,li{ color:#23262b; }
+  a{ color:var(--accent); }
+  .abstract{ background:#f7f9fb; border:1px solid var(--rule); border-left:4px solid var(--accent);
+             border-radius:8px; padding:18px 22px; margin:26px 0 8px; font-size:16px; }
+  .abstract h3{ margin:0 0 8px; font-size:14px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); }
+  .tldr{ background:#fff8e6; border:1px solid #f2e2af; border-radius:8px; padding:14px 20px; margin:22px 0; }
+  table{ border-collapse:collapse; width:100%; margin:18px 0; font-size:14.5px; }
+  th,td{ border-bottom:1px solid var(--rule); padding:8px 10px; text-align:right; }
+  th:first-child,td:first-child{ text-align:left; }
+  thead th{ border-bottom:2px solid #cfd5dc; font-size:13px; color:var(--muted); text-transform:uppercase; letter-spacing:.03em; }
+  tbody tr:hover{ background:#f7f9fb; }
+  .pos{ color:#137a3e; font-variant-numeric:tabular-nums; }
+  .neg{ color:#b3261e; font-variant-numeric:tabular-nums; }
+  td{ font-variant-numeric:tabular-nums; }
+  figure{ margin:26px 0; text-align:center; }
+  figure img{ max-width:100%; border:1px solid var(--rule); border-radius:8px; background:#fff; }
+  figcaption{ color:var(--muted); font-size:13.5px; margin-top:8px; text-align:left; }
+  code{ background:var(--code); padding:1px 5px; border-radius:4px; font-size:14px;
+        font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace; }
+  .key{ font-weight:600; }
+  blockquote{ margin:18px 0; padding:2px 0 2px 18px; border-left:3px solid var(--accent);
+              color:#2a2e34; font-style:italic; }
+  hr{ border:0; border-top:1px solid var(--rule); margin:40px 0; }
+  ol.refs{ font-size:14.5px; color:#33373d; }
+  ol.refs li{ margin:7px 0; }
+  footer{ margin-top:54px; padding-top:18px; border-top:1px solid var(--rule); color:var(--muted); font-size:13.5px; }
+  .nav{ font-size:13.5px; color:var(--muted); margin:18px 0 0; }
+  .nav a{ margin-right:14px; white-space:nowrap; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="title">
+  <div class="tag">{{TAG}}</div>
+  <h1>{{HEADLINE}}</h1>
+  <p class="byline">
+    <strong>{{AUTHOR}}</strong> · {{DATE}} ·
+    <a href="{{CODE_URL}}" target="_blank" rel="noopener">code &amp; full research log ↗</a> ·
+    <a href="index.html">← Alpha Research series</a>
+  </p>
+  <p class="nav">
+    <a href="#abstract">Abstract</a><a href="#intro">1 Introduction</a><a href="#data">2 Data</a><a href="#method">3 Method</a><a href="#results">4 Results</a><a href="#discussion">5 Discussion</a><a href="#limitations">6 Limitations</a><a href="#refs">References</a>
+  </p>
+</header>
+
+<section class="abstract" id="abstract">
+  <h3>Abstract</h3>
+  <p>{{ABSTRACT}}</p>
+</section>
+
+<div class="tldr">
+  <strong>One-line takeaway.</strong> {{TLDR}}
+</div>
+
+<h2 id="intro">1. Introduction</h2>
+<p>{{INTRO}}</p>
+<p>We decompose the question into explicit, falsifiable hypotheses:</p>
+<ul>
+  <li><span class="key">H1.</span> {{HYPOTHESIS_1}}</li>
+  <li><span class="key">H2.</span> {{HYPOTHESIS_2}}</li>
+  <li><span class="key">H3.</span> {{HYPOTHESIS_3}}</li>
+</ul>
+
+<h2 id="data">2. Data &amp; leakage control</h2>
+<p>{{DATA_DESCRIPTION}}</p>
+<ul>
+  <li><span class="key">{{DATASET_1_NAME}}.</span> {{DATASET_1_DESCRIPTION}}</li>
+  <li><span class="key">{{DATASET_2_NAME}}.</span> {{DATASET_2_DESCRIPTION}}</li>
+</ul>
+<p><span class="key">Leakage control is treated as a first-class concern.</span> {{LEAKAGE_CONTROL}}</p>
+
+<h2 id="method">3. Method</h2>
+<p>{{METHOD_OVERVIEW}}</p>
+<h3>3.1 {{METHOD_SUBSECTION_TITLE}}</h3>
+<p>{{METHOD_DETAIL}}</p>
+<p>$${{KEY_EQUATION}}$$</p>
+<h3>3.2 Evaluation</h3>
+<p>{{EVALUATION_PROTOCOL}}
+<!-- State the rigor protocol: purged/embargoed walk-forward, deflated Sharpe,
+     PBO via CSCV, non-overlapping t-stats (t>3 hurdle), realistic costs
+     (full spread + fees + funding), degenerate-signal check, and the trivial
+     baseline + the +0.3-Sharpe mean-reversion floor. -->
+</p>
+
+<h2 id="results">4. Experiments &amp; results</h2>
+
+<h3>4.1 {{RESULT_1_TITLE}}</h3>
+<p>{{RESULT_1_TEXT}}</p>
+<figure>
+  <img src="figures/{{FIGURE_1_FILE}}" alt="{{FIGURE_1_ALT}}">
+  <figcaption><strong>Figure 1.</strong> {{FIGURE_1_CAPTION}}</figcaption>
+</figure>
+
+<h3>4.2 {{RESULT_2_TITLE}}</h3>
+<p>{{RESULT_2_TEXT}}</p>
+<table>
+  <thead><tr><th>{{TABLE_COL_0}}</th><th>{{TABLE_COL_1}}</th><th>{{TABLE_COL_2}}</th></tr></thead>
+  <tbody>
+    <tr><td>{{ROW_1_LABEL}}</td><td class="pos">{{ROW_1_VAL_1}}</td><td>{{ROW_1_VAL_2}}</td></tr>
+    <tr><td>{{ROW_2_LABEL}}</td><td>{{ROW_2_VAL_1}}</td><td class="neg">{{ROW_2_VAL_2}}</td></tr>
+  </tbody>
+</table>
+
+<h2 id="discussion">5. Discussion</h2>
+<p>{{DISCUSSION}}</p>
+
+<h2 id="limitations">6. Limitations &amp; future work</h2>
+<p>{{LIMITATIONS}}</p>
+
+<h2 id="refs">References</h2>
+<ol class="refs">
+  <li id="r1">{{REFERENCE_1}}</li>
+  <li id="r2">{{REFERENCE_2}}</li>
+  <li id="r3">{{REFERENCE_3}}</li>
+</ol>
+
+<footer>
+  <p>Part of the <a href="index.html">Alpha Research</a> series. Code, configs,
+  figures, and the complete dated research log:
+  <a href="{{CODE_URL}}" target="_blank" rel="noopener">{{CODE_URL_TEXT}}</a>.
+  All experiments are leak-controlled and reproducible from raw data.
+  © {{YEAR}} {{AUTHOR}}.</p>
+</footer>
+
+</div>
+</body>
+</html>
