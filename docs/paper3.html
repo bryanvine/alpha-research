@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Statistical Arbitrage in Crypto — Alpha Research</title>
+<meta name="description" content="Does crypto statistical arbitrage survive realistic costs out-of-sample? No: the apparent hourly edge is a stale-price artifact in illiquid coins, and in-sample-selected cointegration pairs lose out-of-sample.">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="apple-touch-icon" href="favicon-180.png">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Statistical Arbitrage in Crypto: An Honest Out-of-Sample Audit">
+<meta property="og:description" content="No net-of-cost stat-arb edge. The apparent hourly signal is a stale-price artifact in illiquid coins (dies at realistic spreads); cointegration pairs are a multiple-testing mirage that loses out-of-sample.">
+<meta property="og:url" content="https://bryanvine.github.io/alpha-research/paper3.html">
+<meta property="og:image" content="https://bryanvine.github.io/alpha-research/og-statarb.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<script>
+  MathJax = { tex: { inlineMath: [['$','$']] }, svg: { fontCache: 'global' } };
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+  :root{ --ink:#1a1a1a; --muted:#5b6470; --rule:#e3e6ea; --accent:#1f6feb; --bg:#fdfdfc; --code:#f5f6f8; }
+  *{ box-sizing:border-box; }
+  html{ -webkit-text-size-adjust:100%; }
+  body{ margin:0; background:var(--bg); color:var(--ink);
+        font:17px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif; }
+  .wrap{ max-width:820px; margin:0 auto; padding:48px 22px 96px; }
+  header.title{ border-bottom:3px solid var(--ink); padding-bottom:22px; margin-bottom:8px; }
+  h1{ font-size:30px; line-height:1.25; margin:0 0 14px; letter-spacing:-0.01em; }
+  .byline{ color:var(--muted); font-size:15px; }
+  .byline a{ color:var(--accent); text-decoration:none; }
+  .tag{ display:inline-block; font-size:12px; font-weight:600; letter-spacing:.04em; text-transform:uppercase;
+        color:#fff; background:var(--accent); padding:2px 9px; border-radius:99px; margin-bottom:14px; }
+  h2{ font-size:22px; margin:46px 0 12px; padding-top:8px; letter-spacing:-0.01em; }
+  h3{ font-size:18px; margin:30px 0 8px; color:#222; }
+  h4{ font-size:15px; margin:20px 0 6px; color:#333; font-weight:600; }
+  p,li{ color:#23262b; }
+  a{ color:var(--accent); }
+  .abstract{ background:#f7f9fb; border:1px solid var(--rule); border-left:4px solid var(--accent);
+             border-radius:8px; padding:18px 22px; margin:26px 0 8px; font-size:16px; }
+  .abstract h3{ margin:0 0 8px; font-size:14px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); }
+  .tldr{ background:#fff8e6; border:1px solid #f2e2af; border-radius:8px; padding:14px 20px; margin:22px 0; }
+  table{ border-collapse:collapse; width:100%; margin:18px 0; font-size:14.5px; }
+  th,td{ border-bottom:1px solid var(--rule); padding:8px 10px; text-align:right; }
+  th:first-child,td:first-child{ text-align:left; }
+  thead th{ border-bottom:2px solid #cfd5dc; font-size:13px; color:var(--muted); text-transform:uppercase; letter-spacing:.03em; }
+  tbody tr:hover{ background:#f7f9fb; }
+  .pos{ color:#137a3e; font-variant-numeric:tabular-nums; }
+  .neg{ color:#b3261e; font-variant-numeric:tabular-nums; }
+  td{ font-variant-numeric:tabular-nums; }
+  figure{ margin:26px 0; text-align:center; }
+  figure img{ max-width:100%; border:1px solid var(--rule); border-radius:8px; background:#fff; }
+  figcaption{ color:var(--muted); font-size:13.5px; margin-top:8px; text-align:left; }
+  code{ background:var(--code); padding:1px 5px; border-radius:4px; font-size:14px;
+        font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace; }
+  .key{ font-weight:600; }
+  blockquote{ margin:18px 0; padding:2px 0 2px 18px; border-left:3px solid var(--accent);
+              color:#2a2e34; font-style:italic; }
+  hr{ border:0; border-top:1px solid var(--rule); margin:40px 0; }
+  ol.refs{ font-size:14.5px; color:#33373d; }
+  ol.refs li{ margin:7px 0; }
+  footer{ margin-top:54px; padding-top:18px; border-top:1px solid var(--rule); color:var(--muted); font-size:13.5px; }
+  .nav{ font-size:13.5px; color:var(--muted); margin:18px 0 0; }
+  .nav a{ margin-right:14px; white-space:nowrap; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="title">
+  <div class="tag">Alpha Research · Paper 3</div>
+  <h1>Statistical Arbitrage in Crypto: An Honest Out-of-Sample Audit</h1>
+  <p class="byline">
+    <strong>Bryan Vine</strong> · June 16, 2026 ·
+    <a href="https://github.com/bryanvine/alpha-research" target="_blank" rel="noopener">code &amp; full research log ↗</a> ·
+    <a href="index.html">← Alpha Research series</a>
+  </p>
+  <p class="nav">
+    <a href="#abstract">Abstract</a><a href="#intro">1 Introduction</a><a href="#data">2 Data</a><a href="#method">3 Method</a><a href="#results">4 Results</a><a href="#discussion">5 Discussion</a><a href="#limitations">6 Limitations</a><a href="#refs">References</a>
+  </p>
+</header>
+
+<section class="abstract" id="abstract">
+  <h3>Abstract</h3>
+  <p>Statistical arbitrage — PCA-residual mean-reversion and cointegration pairs — is the natural place to look for edge in a young, inefficient market, and crypto backtests routinely report &gt;90% pair win-rates. We test whether any of it survives realistic costs out-of-sample, on a daily 30-coin panel (2023–2026) and an hourly ~50-coin panel (2024–2026), with every position estimated strictly walk-forward. <span class="key">It does not.</span> Daily PCA-residual (Avellaneda–Lee s-score) reversion on liquid coins has <em>no edge even gross</em> (Sharpe −0.06) and is strongly negative net (−0.58 at 5 bp/side). The hourly version posts an apparent +0.46 net Sharpe — but it is a <span class="key">stale-price artifact</span>: the edge rises monotonically as liquidity falls (high-liquidity 0.45 → illiquid 1.83), and under realistic per-coin costs it collapses everywhere (illiquid 1.83 → <span class="neg">−1.39</span> at 50 bp, where illiquid alts actually trade). Tellingly, at the unrealistically-low 5 bp the signal is <em>not</em> overfit noise (deflated Sharpe 0.71, PBO 0.21) — it is <em>real</em> non-synchronous-trading reversion that is simply uncapturable. Finally, cointegration pairs are a textbook multiple-testing mirage: <span class="key">210 pairs that pass the in-sample cointegration test lose out-of-sample even before costs</span> (Sharpe −0.87). There is no net-of-cost crypto stat-arb edge for a small participant; the honest contribution is showing precisely <em>why</em> the headline numbers are illusory.</p>
+</section>
+
+<div class="tldr">
+  <strong>One-line takeaway.</strong> No net-of-cost crypto stat-arb edge survives out-of-sample: the apparent hourly signal is non-synchronous-trading mean-reversion in illiquid coins — real, but uncapturable once you pay their true spreads — and in-sample-selected cointegration pairs lose out-of-sample.
+</div>
+
+<h2 id="intro">1. Introduction</h2>
+<p>If alpha lives anywhere in crypto, it should be in <span class="key">statistical arbitrage</span> — exploiting transient mispricings between related coins via mean-reversion. The two canonical engines are PCA-residual reversion (Avellaneda &amp; Lee's &ldquo;s-score&rdquo; <a href="#r1">[1]</a>) and cointegration pairs (Engle–Granger <a href="#r2">[2]</a>), and crypto backtests of both routinely look spectacular. This paper asks the only question that matters: <span class="key">does any of it survive realistic costs, out-of-sample, for a participant who is not a colocated market maker?</span> Following the series' pattern (Paper 1: a real premium with no tradable edge; Paper 2: a thin premium that <em>is</em> tradable), we pre-register hypotheses and let honest costs and the rigor protocol decide:</p>
+<ul>
+  <li><span class="key">H1.</span> PCA-residual and cointegration stat-arb net Sharpe is ≤ 0.5 (often negative) out-of-sample after realistic costs. <em>(Confirmed.)</em></li>
+  <li><span class="key">H2.</span> In-sample-selected cointegration pairs collapse out-of-sample. <em>(Confirmed — 210 pairs lose OOS, even gross.)</em></li>
+  <li><span class="key">H3.</span> Any apparent edge concentrates in illiquid coins (a stale-price artifact) and dies at their real spreads. <em>(Confirmed — monotonic in liquidity; negative at realistic costs.)</em></li>
+</ul>
+
+<h2 id="data">2. Data &amp; leakage control</h2>
+<p>Two panels: a <span class="key">daily 30-coin</span> spot panel (Binance, 2023–2026) and an <span class="key">hourly ~50-coin</span> panel (2024–2026) carrying volume for a liquidity split. <span class="key">Leakage control is structural:</span> the s-score at bar $t$ is estimated only from the trailing window ending at $t-1$, and the resulting weights earn the $t\!-\!1\!\to\!t$ return — so the strategy is walk-forward by construction, never fit on data it trades. Cointegration pairs are re-selected each formation window and traded only out-of-sample. Costs are charged on realized turnover; we report a full per-coin cost sweep because, as we show, the conclusion lives or dies on cost realism.</p>
+
+<h2 id="method">3. Method</h2>
+<p><span class="key">PCA-residual s-score (Avellaneda–Lee).</span> Over a rolling window we extract the top-$k$ eigenportfolios of standardized returns, regress each coin on them, and model the cumulative residual as an OU process. The standardized deviation $s_i=(X_i-m_i)/\sigma_{eq,i}$ is the signal; we go contrarian on it (buy oversold residuals, sell overbought), dollar-neutral, gross exposure 1.0. <span class="key">Cointegration pairs.</span> Each formation window we test all pairs for cointegration (Engle–Granger, $p&lt;0.05$), select the strongest, and trade the spread z-score (enter $|z|&gt;2$, exit $|z|&lt;0.5$) out-of-sample.</p>
+<h3>3.1 The rigor gauntlet</h3>
+<p>Degenerate-signal check first; deflated Sharpe <a href="#r4">[4]</a> and PBO via CSCV <a href="#r5">[5]</a> over the configuration grid; purged + embargoed walk-forward; a <span class="key">liquidity-tercile decomposition</span> and a per-tercile cost sweep (the decisive test for stale-price artifacts); and the +0.3 mean-reversion floor as the bar.</p>
+
+<h2 id="results">4. Experiments &amp; results</h2>
+
+<h3>4.1 Daily stat-arb on liquid coins is dead (H1)</h3>
+<p>On the 30 most-liquid coins, daily PCA-residual reversion has <em>no edge before costs</em> (gross Sharpe −0.06) and is firmly negative net (−0.58 at 5 bp/side, −1.1 at 10 bp, −2.13 at 20 bp), with a −74% maximum drawdown and a 49% win rate (Figure 1). There is simply nothing to harvest where you could actually trade it cheaply.</p>
+<figure>
+  <img src="figures/p3_fig1_daily_dead.png" alt="Daily stat-arb cumulative PnL, gross flat and net negative">
+  <figcaption><strong>Figure 1.</strong> Daily PCA-residual stat-arb on the 30 liquid coins: gross PnL (dashed) is flat-to-down; net of a modest 5 bp/side it bleeds out. No edge even before costs.</figcaption>
+</figure>
+
+<h3>4.2 The hourly &ldquo;edge&rdquo; is a stale-price artifact (H3)</h3>
+<p>At hourly frequency the strategy posts an apparent +0.46 net Sharpe. But decomposing by liquidity reveals it for what it is: the Sharpe <em>rises monotonically as liquidity falls</em> — 0.45 (high-liquidity) → 0.98 (mid) → <span class="key">1.83 (illiquid alts)</span> — the signature of non-synchronous-trading mean-reversion <a href="#r3">[3]</a>, where stale prices in thinly-traded coins &ldquo;revert&rdquo; mechanically. The decisive test is the per-coin cost sweep (Figure 2): the edge survives only at an <em>unrealistically low</em> 5 bp/side. At the spreads illiquid alts actually carry (50–100 bp), it is deeply negative — illiquid 1.83 → −1.39 (50 bp) → −3.46 (80 bp) — and even the liquid tercile turns negative by 20 bp. The edge lives exactly where it cannot be captured.</p>
+<figure>
+  <img src="figures/p3_fig2_tercile_cost.png" alt="Net Sharpe by liquidity tercile across cost levels">
+  <figcaption><strong>Figure 2.</strong> Net Sharpe by liquidity tercile across one-way cost levels. At 5 bp the &ldquo;edge&rdquo; is largest in the illiquid coins (red); at the realistic illiquid-coin spread (shaded, 50–100 bp) every tercile is deeply negative. The apparent alpha is a stale-price artifact.</figcaption>
+</figure>
+<table>
+  <thead><tr><th>Net Sharpe</th><th>5 bp</th><th>20 bp</th><th>50 bp</th><th>80 bp</th></tr></thead>
+  <tbody>
+    <tr><td>High liquidity</td><td class="pos">0.45</td><td class="neg">−0.86</td><td class="neg">−3.42</td><td class="neg">−5.79</td></tr>
+    <tr><td>Mid liquidity</td><td class="pos">0.98</td><td class="neg">−0.42</td><td class="neg">−3.14</td><td class="neg">−5.65</td></tr>
+    <tr><td>Low liquidity (illiquid)</td><td class="pos">1.83</td><td class="pos">0.75</td><td class="neg">−1.39</td><td class="neg">−3.46</td></tr>
+  </tbody>
+</table>
+<p>Crucially, this is <em>not</em> an overfitting story. At the (fictional) 5 bp cost, the hourly strategy passes selection rigor — deflated Sharpe 0.71, PBO 0.21, walk-forward OOS 0.36. The reversion is statistically <em>real</em>; it is just economically uncapturable. That distinction is the point.</p>
+
+<h3>4.3 Cointegration pairs: a multiple-testing mirage (H2)</h3>
+<p>Cointegration pairs fail differently — through selection. Across formation windows, <span class="key">210 pairs passed the in-sample cointegration test</span> ($p&lt;0.05$). Traded out-of-sample, they <em>lose money even before costs</em> (Sharpe −0.87 gross, −0.89 net; Figure 3). Testing hundreds of pairs guarantees spurious in-sample cointegration that does not persist — the headline &ldquo;&gt;90% win-rate&rdquo; backtests are selecting noise.</p>
+<figure>
+  <img src="figures/p3_fig3_coint_collapse.png" alt="Cointegration pairs out-of-sample Sharpe, negative">
+  <figcaption><strong>Figure 3.</strong> Out-of-sample performance of cointegration pairs: 210 in-sample-selected &ldquo;cointegrated&rdquo; pairs lose out-of-sample even gross of costs — a textbook multiple-testing collapse.</figcaption>
+</figure>
+
+<h2 id="discussion">5. Discussion</h2>
+<p>Crypto looks like the ideal habitat for statistical arbitrage, and the backtests oblige. Every one of them, here, is an illusion — but the illusions have two distinct anatomies worth separating.</p>
+<blockquote>There is no net-of-cost statistical-arbitrage edge for a small participant in crypto: the apparent hourly signal is non-synchronous-trading mean-reversion in illiquid coins — real, but uncapturable once you pay their true spreads — and in-sample-selected cointegration pairs are a multiple-testing mirage that loses out-of-sample.</blockquote>
+<p>The PCA-residual edge is a <em>measurement</em> illusion: stale prices in illiquid coins manufacture mechanical reversion that a naive flat-cost backtest counts as alpha, but that the coins' real 50–100 bp spreads erase. The cointegration edge is a <em>selection</em> illusion: enough pairs, enough tests, and some will look cointegrated in-sample by chance. Neither survives the honest treatment. This completes a clean triptych across the series — Paper 1's real-but-untradable premium, Paper 2's thin-but-tradable factor, and Paper 3's tradable-looking-but-illusory edge — and underscores the program's thesis: in efficient-enough markets, <span class="key">rigorous cost modeling and out-of-sample discipline are the alpha</span>, because they are what separate the one real edge from the many fake ones.</p>
+
+<h2 id="limitations">6. Limitations &amp; future work</h2>
+<p><span class="key">Cost model.</span> We use per-side cost levels rather than coin-by-coin measured spreads; the conclusion is robust because we sweep the full plausible range and illiquid alts demonstrably trade at 50–100 bp, but a tick-level spread series would sharpen the per-coin picture. <span class="key">No order book.</span> We test signal economics, not execution — a colocated market maker posting passively (negative-fee, queue-priority) faces a different cost structure, which is the subject of Paper 5 (liquidity provision), not this paper. <span class="key">Universe &amp; survivorship.</span> Today's liquid names; a point-in-time, delisted-inclusive universe would, if anything, strengthen the negative (dead coins add stale-price noise, not edge). <span class="key">Scope.</span> We test PCA-residual and Engle–Granger pairs; richer structures (Johansen baskets, ML-selected spreads, lead–lag across venues) are unlikely to overturn the cost and selection problems, but a cross-venue lead–lag study on a fast feed is the one direction with a non-trivial prior — left to future work.</p>
+
+<h2 id="refs">References</h2>
+<ol class="refs">
+  <li id="r1">M. Avellaneda &amp; J.-H. Lee (2010). &ldquo;Statistical Arbitrage in the US Equities Market.&rdquo; <em>Quantitative Finance</em> 10(7). (The PCA-residual &ldquo;s-score&rdquo; method.)</li>
+  <li id="r2">R. Engle &amp; C. Granger (1987). &ldquo;Co-integration and Error Correction: Representation, Estimation, and Testing.&rdquo; <em>Econometrica</em> 55(2).</li>
+  <li id="r3">A. Lo &amp; A. C. MacKinlay (1990). &ldquo;When Are Contrarian Profits Due to Stock Market Overreaction?&rdquo; <em>Review of Financial Studies</em> 3(2). (Non-synchronous trading manufactures spurious mean-reversion.)</li>
+  <li id="r4">D. Bailey &amp; M. López de Prado (2014). &ldquo;The Deflated Sharpe Ratio.&rdquo; <em>Journal of Portfolio Management</em>.</li>
+  <li id="r5">D. Bailey, J. Borwein, M. López de Prado &amp; Q. Zhu (2017). &ldquo;The Probability of Backtest Overfitting.&rdquo; <em>Journal of Computational Finance</em>.</li>
+  <li id="r6">B. Vine (2026). &ldquo;Crypto Carry: The Funding-Rate Cross-Section&rdquo; &amp; &ldquo;The Volatility Risk Premium, Cross-Asset.&rdquo; <em>Alpha Research</em>, Papers 1–2.</li>
+</ol>
+
+<footer>
+  <p>Part of the <a href="index.html">Alpha Research</a> series. Code, configs, figures, and the complete dated research log:
+  <a href="https://github.com/bryanvine/alpha-research" target="_blank" rel="noopener">github.com/bryanvine/alpha-research</a>.
+  All experiments are leak-controlled and reproducible from raw data. © 2026 Bryan Vine.</p>
+</footer>
+
+</div>
+</body>
+</html>
