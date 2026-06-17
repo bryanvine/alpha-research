@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FX Carry & Commodity Roll Yield — Alpha Research</title>
+<meta name="description" content="Finance's most-documented anomalies on newly-sourced data: FX carry is modest and decaying (0.64→0.2, crash-prone), FX value steadier (~0.46), energy roll yield has no net edge. The finale of the Alpha Research series — what six papers of honest search found.">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="apple-touch-icon" href="favicon-180.png">
+<meta property="og:type" content="article">
+<meta property="og:title" content="FX Carry & Commodity Roll Yield — and What Six Papers of Honest Search Found">
+<meta property="og:description" content="FX carry decays and crashes; FX value is steadier; energy roll yield has no net edge. Across six papers, the real edges are modest risk premia (~0.4 Sharpe) clustered at the floor — never the spectacular alphas of the backtests.">
+<meta property="og:url" content="https://bryanvine.github.io/alpha-research/paper6.html">
+<meta property="og:image" content="https://bryanvine.github.io/alpha-research/og-carry-macro.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<script>
+  MathJax = { tex: { inlineMath: [['$','$']] }, svg: { fontCache: 'global' } };
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+  :root{ --ink:#1a1a1a; --muted:#5b6470; --rule:#e3e6ea; --accent:#1f6feb; --bg:#fdfdfc; --code:#f5f6f8; }
+  *{ box-sizing:border-box; }
+  html{ -webkit-text-size-adjust:100%; }
+  body{ margin:0; background:var(--bg); color:var(--ink);
+        font:17px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif; }
+  .wrap{ max-width:820px; margin:0 auto; padding:48px 22px 96px; }
+  header.title{ border-bottom:3px solid var(--ink); padding-bottom:22px; margin-bottom:8px; }
+  h1{ font-size:30px; line-height:1.25; margin:0 0 14px; letter-spacing:-0.01em; }
+  .byline{ color:var(--muted); font-size:15px; }
+  .byline a{ color:var(--accent); text-decoration:none; }
+  .tag{ display:inline-block; font-size:12px; font-weight:600; letter-spacing:.04em; text-transform:uppercase;
+        color:#fff; background:var(--accent); padding:2px 9px; border-radius:99px; margin-bottom:14px; }
+  h2{ font-size:22px; margin:46px 0 12px; padding-top:8px; letter-spacing:-0.01em; }
+  h3{ font-size:18px; margin:30px 0 8px; color:#222; }
+  h4{ font-size:15px; margin:20px 0 6px; color:#333; font-weight:600; }
+  p,li{ color:#23262b; }
+  a{ color:var(--accent); }
+  .abstract{ background:#f7f9fb; border:1px solid var(--rule); border-left:4px solid var(--accent);
+             border-radius:8px; padding:18px 22px; margin:26px 0 8px; font-size:16px; }
+  .abstract h3{ margin:0 0 8px; font-size:14px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); }
+  .tldr{ background:#fff8e6; border:1px solid #f2e2af; border-radius:8px; padding:14px 20px; margin:22px 0; }
+  table{ border-collapse:collapse; width:100%; margin:18px 0; font-size:14.5px; }
+  th,td{ border-bottom:1px solid var(--rule); padding:8px 10px; text-align:right; }
+  th:first-child,td:first-child{ text-align:left; }
+  thead th{ border-bottom:2px solid #cfd5dc; font-size:13px; color:var(--muted); text-transform:uppercase; letter-spacing:.03em; }
+  tbody tr:hover{ background:#f7f9fb; }
+  .pos{ color:#137a3e; font-variant-numeric:tabular-nums; }
+  .neg{ color:#b3261e; font-variant-numeric:tabular-nums; }
+  td{ font-variant-numeric:tabular-nums; }
+  figure{ margin:26px 0; text-align:center; }
+  figure img{ max-width:100%; border:1px solid var(--rule); border-radius:8px; background:#fff; }
+  figcaption{ color:var(--muted); font-size:13.5px; margin-top:8px; text-align:left; }
+  code{ background:var(--code); padding:1px 5px; border-radius:4px; font-size:14px;
+        font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace; }
+  .key{ font-weight:600; }
+  blockquote{ margin:18px 0; padding:2px 0 2px 18px; border-left:3px solid var(--accent);
+              color:#2a2e34; font-style:italic; }
+  hr{ border:0; border-top:1px solid var(--rule); margin:40px 0; }
+  ol.refs{ font-size:14.5px; color:#33373d; }
+  ol.refs li{ margin:7px 0; }
+  footer{ margin-top:54px; padding-top:18px; border-top:1px solid var(--rule); color:var(--muted); font-size:13.5px; }
+  .nav{ font-size:13.5px; color:var(--muted); margin:18px 0 0; }
+  .nav a{ margin-right:14px; white-space:nowrap; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="title">
+  <div class="tag">Alpha Research · Paper 6 · Finale</div>
+  <h1>FX Carry &amp; Commodity Roll Yield — and What Six Papers of Honest Search Found</h1>
+  <p class="byline">
+    <strong>Bryan Vine</strong> · June 17, 2026 ·
+    <a href="https://github.com/bryanvine/alpha-research" target="_blank" rel="noopener">code &amp; full research log ↗</a> ·
+    <a href="index.html">← Alpha Research series</a>
+  </p>
+  <p class="nav">
+    <a href="#abstract">Abstract</a><a href="#intro">1 Introduction</a><a href="#data">2 Data</a><a href="#method">3 Method</a><a href="#results">4 Results</a><a href="#discussion">5 The program</a><a href="#limitations">6 Limitations</a><a href="#refs">References</a>
+  </p>
+</header>
+
+<section class="abstract" id="abstract">
+  <h3>Abstract</h3>
+  <p>FX carry and commodity roll yield are the most-documented anomalies in finance, so they make a fitting finale. On newly-sourced free data — G10 currencies (1971–2026) and EIA energy-futures term structure (WTI, natural gas, heating oil, RBOB; 2004–2024) — we find them real but thin. <span class="key">FX carry</span> earns a full-sample Sharpe of 0.44 but <span class="key">decays from 0.64 pre-2008 to ~0.2 since</span>, with the negative skew of the carry-crash; <span class="key">FX value</span> (real-exchange-rate reversion) is steadier at 0.46 and, unusually, stronger post-2008. <span class="key">Energy roll yield and basis-momentum net to roughly zero</span> (−0.22 and −0.06) once the term structure is constructed correctly — and getting that construction wrong (a naive spliced front-contract series) produced a spurious −1.57 Sharpe, a live demonstration of the paper's own warning. None of these is a standalone edge; they are diversified-book ingredients at small weight, around the ~0.41 net Sharpe of AQR's live multi-style fund. We close by tallying every edge tested across the six-paper program: the handful that survive net of costs — crypto trend, FX value and carry, the liquidity-provision premium, crypto funding carry, equity quality — cluster modestly around a 0.4 Sharpe, just above our floor. The spectacular alphas of the backtests were, without exception, artifacts. The durable edges are modest risk premia, and the real alpha was the rigor that told them apart.</p>
+</section>
+
+<div class="tldr">
+  <strong>One-line takeaway.</strong> FX carry is modest and decaying (crash-prone), FX value steadier, energy roll yield ≈ zero net. And across all six papers, every edge that survived honest costs is a modest risk premium (~0.4 Sharpe) clustered at the floor — never the spectacular backtest alpha. Rigor was the edge.
+</div>
+
+<h2 id="intro">1. Introduction</h2>
+<p>The carry trade — earn the yield differential and hope the exchange rate or futures curve doesn't move against you — is the oldest and best-documented cross-asset anomaly <a href="#r1">[1]</a><a href="#r2">[2]</a>. If anything in this series should be a clean, durable premium, it is this. We test FX carry and value (G10) and commodity roll yield and basis-momentum (energy), on free data, net of costs, with explicit attention to the two things that kill these trades: <span class="key">crash risk</span> (carry's fat left tail) and <span class="key">post-financialization decay</span>. Pre-registered:</p>
+<ul>
+  <li><span class="key">H1.</span> Diversified FX carry nets ~0.2–0.4 with negative skew; it has decayed post-2008. <em>(Confirmed.)</em></li>
+  <li><span class="key">H2.</span> FX value is comparable and roughly uncorrelated with carry. <em>(Confirmed — steadier, 0.46.)</em></li>
+  <li><span class="key">H3.</span> Commodity roll yield / basis-momentum survive in the curve. <em>(Refuted for energy — ≈0 net.)</em></li>
+  <li><span class="key">H4.</span> The premia decayed with financialization (post-2010). <em>(Confirmed in direction.)</em></li>
+</ul>
+
+<h2 id="data">2. Data &amp; leakage control</h2>
+<p><span class="key">FX:</span> G10 spot and 3-month rate differentials vs USD (FRED), real effective exchange rates (BIS), and CFTC positioning — monthly, 1971–2026. <span class="key">Commodities:</span> EIA daily settlement prices for the front-through-fourth contract of WTI, Henry Hub gas, NY Harbor heating oil, and RBOB gasoline (2004–2024) — a genuine multi-contract energy curve, the gap that no free continuous-futures feed could fill. Signals are lagged one month before being applied to the next month's return. <span class="key">A construction caveat we turned into a result:</span> a futures &ldquo;return&rdquo; naively computed from the spliced front-contract series (C1ₜ/C1ₜ₋₁) injects the monthly roll with the wrong sign and produced a spurious −1.57 Sharpe; the correct roll-adjusted return tracks the held contract (the second-nearest last month is the front this month, $\log(C1_t/C2_{t-1})$). The roll method <em>is</em> the signal — exactly as the literature warns.</p>
+
+<h2 id="method">3. Method</h2>
+<p>FX carry sorts currencies on the rate differential (long the top three, short the bottom three, dollar-neutral, monthly, net 5 bp); FX value sorts on REER deviation. The monthly excess return of holding a foreign currency is the interest differential plus its appreciation. Commodity roll yield sorts the four energy futures on $\log(C1/C2)$ (backwardation vs contango); basis-momentum on the front-minus-back 12-month return; both traded long-short on the roll-adjusted front return, net 10 bp. Benchmarks: the +0.3 mean-reversion floor and AQR's QSPIX ~0.41 live multi-style net Sharpe as the realistic professional ceiling.</p>
+
+<h2 id="results">4. Experiments &amp; results</h2>
+
+<h3>4.1 FX carry decays and crashes; value is steadier (H1, H2, H4)</h3>
+<p>FX carry is real but fading. Its full-sample Sharpe is 0.44, but it fell from <span class="key">0.64 before 2008 to 0.09 (2008–15) and 0.22 since</span> (Figure 1), carrying the negative skew (−0.16) that is the carry trade's signature — long stretches of yield punctuated by violent unwinds. FX value, by contrast, earns 0.46 with <em>positive</em> skew and is actually <em>stronger</em> post-2008 (0.61); it is the more robust and more diversifying of the two. Both, however, sit at or below the ~0.41 a live multi-style fund delivers — modest premia, not standalone edges.</p>
+<figure>
+  <img src="figures/p6_fig1_fx.png" alt="FX carry and value Sharpe by sub-period">
+  <figcaption><strong>Figure 1.</strong> G10 FX carry and value Sharpe by sub-period. Carry decays from 0.64 to ~0.2 (and crashes); value is steadier and strengthens post-2008.</figcaption>
+</figure>
+
+<h3>4.2 Energy roll yield has no net edge (H3)</h3>
+<p>On the four energy curves, neither roll-yield carry (Sharpe −0.22) nor basis-momentum (−0.06) clears zero net of costs; both were mildly positive pre-2010 and turned negative post-2010 (Figure 2), the financialization decay the literature documents for commodity-curve strategies. The thin four-commodity cross-section and realistic costs leave nothing to harvest in the most liquid, free-data corner of the complex. (The broad cross-commodity universe, where basis-momentum is reported to survive, needs a paid multi-contract feed — flagged as the boundary of this result.)</p>
+<figure>
+  <img src="figures/p6_fig2_commodity.png" alt="Commodity energy roll yield and basis-momentum by sub-period">
+  <figcaption><strong>Figure 2.</strong> Energy roll-yield carry and basis-momentum Sharpe, pre- vs post-2010. Mildly positive before financialization, negative after — no net edge in the four-commodity energy cross-section.</figcaption>
+</figure>
+
+<h3>4.3 The program, tallied (the capstone)</h3>
+<p>This is the sixth and final paper, so we put every edge tested across the program on one axis (Figure 3): net-of-cost Sharpe, against the +0.3 floor. The pattern is the thesis. The edges that <em>survive</em> — crypto trend, FX value, FX carry, the liquidity-provision premium, crypto funding carry, equity quality — form a tight cluster between roughly 0.39 and 0.53, modest premia that barely clear the floor. The edges that <em>die</em> — equity momentum, commodity roll yield, daily sentiment, crypto statistical arbitrage, and (not shown, from prior in-house work) directional ML and RL — sit at or well below zero. Nothing approaches the spectacular Sharpes that the raw backtests advertised; every one of those was an artifact of selection, smoothness, stale prices, decay, or cost-blindness.</p>
+<figure>
+  <img src="figures/p6_fig3_capstone.png" alt="Net-of-cost Sharpe of every edge tested across the six-paper program">
+  <figcaption><strong>Figure 3.</strong> Every edge tested across the six-paper Alpha Research program, by net-of-cost Sharpe. The survivors are modest risk premia clustered just above the +0.3 floor; the spectacular backtest alphas were all artifacts.</figcaption>
+</figure>
+
+<h2 id="discussion">5. What six papers of honest search found</h2>
+<p>We set out to hunt for harvestable alpha across crypto, equities, FX, commodities, and volatility, and to publish the results honestly — negatives included. Six papers later, the findings rhyme:</p>
+<ul>
+  <li><span class="key">Paper 1 (volatility risk premium):</span> a real, robust premium that is <em>not</em> harvestable net of options-execution costs, and is decaying in crypto.</li>
+  <li><span class="key">Paper 2 (crypto carry):</span> the famous &ldquo;Sharpe-6&rdquo; level trade is an artifact, but the cross-sectional funding factor is a genuine, modest, out-of-sample edge (~0.4).</li>
+  <li><span class="key">Paper 3 (crypto stat-arb):</span> illusory — a stale-price artifact in illiquid coins plus a multiple-testing mirage.</li>
+  <li><span class="key">Paper 4 (the factor zoo):</span> a replication crisis — anomalies decay ~half post-publication; only low-turnover quality survives.</li>
+  <li><span class="key">Paper 5 (liquidity provision):</span> no standalone microstructure alpha, but a real execution edge and a vol-conditional liquidity-provision premium.</li>
+  <li><span class="key">Paper 6 (FX &amp; commodity carry):</span> modest, decayed, crash-prone — diversified-book ingredients, not standalone edges.</li>
+</ul>
+<blockquote>The durable edges are modest risk premia — compensation for providing liquidity, insurance, or financing — clustered around a 0.4 Sharpe. Every spectacular backtest alpha we examined was an artifact. The real alpha was the rigor that told the two apart.</blockquote>
+<p>Three lessons generalize. <span class="key">First, cost and structure realism is decisive</span> — half-spreads, turnover, queue position, the roll method, options execution: in market after market, the honest cost model is what separated the one real edge from the many fake ones. <span class="key">Second, the survivors share a form</span>: they pay you for <em>providing</em> something the market needs — liquidity (reversal), insurance (the volatility premium), financing (carry) — not for forecasting direction, which failed everywhere we looked. <span class="key">Third, modest is the ceiling</span>: a small, honest participant should expect a diversified book of these premia to deliver something like the ~0.4 net Sharpe a live multi-style fund earns — not the double-digit Sharpes of the literature, which do not survive contact with costs, out-of-sample data, or a second look. That is not a disappointing answer. It is the correct one, and arriving at it honestly — rather than deploying capital on an artifact — is the whole point.</p>
+
+<h2 id="limitations">6. Limitations &amp; future work</h2>
+<p><span class="key">Commodities are energy-only.</span> Four liquid energy curves are a thin cross-section; the broad commodity universe (metals, ags, softs) where basis-momentum is reported to survive needs a paid multi-contract feed, and the EIA series end in 2024. <span class="key">FX forwards.</span> We proxy carry with the rate differential rather than traded forward points (free forwards are scarce; covered-interest parity broke down post-2008), and use EM-free G10 — the higher-carry, higher-crash EM currencies would sharpen both the premium and its tail. <span class="key">Construction.</span> The roll-adjusted return is the standard second-to-first approximation; a true contract-level roll calendar would refine it. <span class="key">Program-wide:</span> the natural next step is portfolio construction — combining the half-dozen surviving ~0.4-Sharpe premia (diversifying across crypto trend, FX value/carry, quality, liquidity provision, funding carry) into a single vol-targeted book, and asking whether the diversified whole clears, and stays above, the QSPIX-like ceiling net of all costs. That — not another lone-anomaly hunt — is where the modest, real edges might add up to something worth trading.</p>
+
+<h2 id="refs">References</h2>
+<ol class="refs">
+  <li id="r1">R. Koijen, T. Moskowitz, L. Pedersen &amp; E. Vrugt (2018). &ldquo;Carry.&rdquo; <em>Journal of Financial Economics</em> 127(2).</li>
+  <li id="r2">H. Lustig, N. Roussanov &amp; A. Verdelhan (2011). &ldquo;Common Risk Factors in Currency Markets.&rdquo; <em>Review of Financial Studies</em> 24(11).</li>
+  <li id="r3">M. Boons &amp; M. P. Prado (2019). &ldquo;Basis-Momentum.&rdquo; <em>Journal of Finance</em> 74(1).</li>
+  <li id="r4">G. Gorton &amp; K. G. Rouwenhorst (2006). &ldquo;Facts and Fantasies about Commodity Futures.&rdquo; <em>Financial Analysts Journal</em> 62(2).</li>
+  <li id="r5">C. Asness, T. Moskowitz &amp; L. Pedersen (2013). &ldquo;Value and Momentum Everywhere.&rdquo; <em>Journal of Finance</em> 68(3).</li>
+  <li id="r6">B. Vine (2026). &ldquo;The Volatility Risk Premium,&rdquo; &ldquo;Crypto Carry,&rdquo; &ldquo;Statistical Arbitrage in Crypto,&rdquo; &ldquo;The Cost of Direction,&rdquo; &ldquo;Liquidity Provision as Alpha.&rdquo; <em>Alpha Research</em>, Papers 1–5.</li>
+</ol>
+
+<footer>
+  <p>The finale of the <a href="index.html">Alpha Research</a> series. Code, configs, figures, and the complete dated research log:
+  <a href="https://github.com/bryanvine/alpha-research" target="_blank" rel="noopener">github.com/bryanvine/alpha-research</a>.
+  All experiments are leak-controlled and reproducible from raw data. © 2026 Bryan Vine.</p>
+</footer>
+
+</div>
+</body>
+</html>
