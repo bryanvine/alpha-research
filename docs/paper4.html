@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Cost of Direction — Alpha Research</title>
+<meta name="description" content="A net-of-cost audit of the directional anomaly zoo. 212 published predictors decay 53% out-of-sample; in the last decade the median has a Sharpe of 0.22 and only 3% are statistically strong. Only low-turnover quality survives.">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="apple-touch-icon" href="favicon-180.png">
+<meta property="og:type" content="article">
+<meta property="og:title" content="The Cost of Direction: An Honest Audit of the Directional Anomaly Zoo">
+<meta property="og:description" content="212 published predictors decay 53% out-of-sample; the median anomaly's recent-decade Sharpe is 0.22 and only 3% are statistically strong; realistic costs erase most of the rest. Only low-turnover quality survives.">
+<meta property="og:url" content="https://bryanvine.github.io/alpha-research/paper4.html">
+<meta property="og:image" content="https://bryanvine.github.io/alpha-research/og-zoo.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<script>
+  MathJax = { tex: { inlineMath: [['$','$']] }, svg: { fontCache: 'global' } };
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+  :root{ --ink:#1a1a1a; --muted:#5b6470; --rule:#e3e6ea; --accent:#1f6feb; --bg:#fdfdfc; --code:#f5f6f8; }
+  *{ box-sizing:border-box; }
+  html{ -webkit-text-size-adjust:100%; }
+  body{ margin:0; background:var(--bg); color:var(--ink);
+        font:17px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif; }
+  .wrap{ max-width:820px; margin:0 auto; padding:48px 22px 96px; }
+  header.title{ border-bottom:3px solid var(--ink); padding-bottom:22px; margin-bottom:8px; }
+  h1{ font-size:30px; line-height:1.25; margin:0 0 14px; letter-spacing:-0.01em; }
+  .byline{ color:var(--muted); font-size:15px; }
+  .byline a{ color:var(--accent); text-decoration:none; }
+  .tag{ display:inline-block; font-size:12px; font-weight:600; letter-spacing:.04em; text-transform:uppercase;
+        color:#fff; background:var(--accent); padding:2px 9px; border-radius:99px; margin-bottom:14px; }
+  h2{ font-size:22px; margin:46px 0 12px; padding-top:8px; letter-spacing:-0.01em; }
+  h3{ font-size:18px; margin:30px 0 8px; color:#222; }
+  h4{ font-size:15px; margin:20px 0 6px; color:#333; font-weight:600; }
+  p,li{ color:#23262b; }
+  a{ color:var(--accent); }
+  .abstract{ background:#f7f9fb; border:1px solid var(--rule); border-left:4px solid var(--accent);
+             border-radius:8px; padding:18px 22px; margin:26px 0 8px; font-size:16px; }
+  .abstract h3{ margin:0 0 8px; font-size:14px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); }
+  .tldr{ background:#fff8e6; border:1px solid #f2e2af; border-radius:8px; padding:14px 20px; margin:22px 0; }
+  table{ border-collapse:collapse; width:100%; margin:18px 0; font-size:14.5px; }
+  th,td{ border-bottom:1px solid var(--rule); padding:8px 10px; text-align:right; }
+  th:first-child,td:first-child{ text-align:left; }
+  thead th{ border-bottom:2px solid #cfd5dc; font-size:13px; color:var(--muted); text-transform:uppercase; letter-spacing:.03em; }
+  tbody tr:hover{ background:#f7f9fb; }
+  .pos{ color:#137a3e; font-variant-numeric:tabular-nums; }
+  .neg{ color:#b3261e; font-variant-numeric:tabular-nums; }
+  td{ font-variant-numeric:tabular-nums; }
+  figure{ margin:26px 0; text-align:center; }
+  figure img{ max-width:100%; border:1px solid var(--rule); border-radius:8px; background:#fff; }
+  figcaption{ color:var(--muted); font-size:13.5px; margin-top:8px; text-align:left; }
+  code{ background:var(--code); padding:1px 5px; border-radius:4px; font-size:14px;
+        font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace; }
+  .key{ font-weight:600; }
+  blockquote{ margin:18px 0; padding:2px 0 2px 18px; border-left:3px solid var(--accent);
+              color:#2a2e34; font-style:italic; }
+  hr{ border:0; border-top:1px solid var(--rule); margin:40px 0; }
+  ol.refs{ font-size:14.5px; color:#33373d; }
+  ol.refs li{ margin:7px 0; }
+  footer{ margin-top:54px; padding-top:18px; border-top:1px solid var(--rule); color:var(--muted); font-size:13.5px; }
+  .nav{ font-size:13.5px; color:var(--muted); margin:18px 0 0; }
+  .nav a{ margin-right:14px; white-space:nowrap; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="title">
+  <div class="tag">Alpha Research · Paper 4</div>
+  <h1>The Cost of Direction: A Net-of-Cost Audit of the Directional Anomaly Zoo</h1>
+  <p class="byline">
+    <strong>Bryan Vine</strong> · June 17, 2026 ·
+    <a href="https://github.com/bryanvine/alpha-research" target="_blank" rel="noopener">code &amp; full research log ↗</a> ·
+    <a href="index.html">← Alpha Research series</a>
+  </p>
+  <p class="nav">
+    <a href="#abstract">Abstract</a><a href="#intro">1 Introduction</a><a href="#data">2 Data</a><a href="#method">3 Method</a><a href="#results">4 Results</a><a href="#discussion">5 Discussion</a><a href="#limitations">6 Limitations</a><a href="#refs">References</a>
+  </p>
+</header>
+
+<section class="abstract" id="abstract">
+  <h3>Abstract</h3>
+  <p>The cross-sectional &ldquo;factor zoo&rdquo; — hundreds of published anomalies — is the obvious place to look for directional alpha. We audit it honestly, out-of-sample and net of costs, using the 212 published predictors of the Open-Source Asset Pricing dataset (Chen–Zimmermann) plus the Ken French factors, and we cross-check on our own equity and crypto data. The headline is a replication crisis. The 212 predictors <span class="key">decay 53% out-of-sample</span> (in-sample 0.69%/month → 0.32%/month), almost exactly matching McLean–Pontiff. The publication <em>t</em>&gt;2 bar is far too lax — only <span class="key">61% clear |t|&gt;3</span> full-sample (median |t| = 3.4). In the most recent decade the median anomaly has a <span class="key">Sharpe of just 0.22</span> (below our +0.3 floor), only <span class="key">3% are statistically strong (|t|&gt;3)</span>, and because these equal-weight long-shorts are high-turnover, a realistic cost of 30 bp/month of turnover leaves only <span class="key">43% even positive</span>. Among the canonical Fama–French factors, only the market (Sharpe 0.77) and <span class="key">profitability/quality (RMW, 0.39)</span> clear the floor over 2015–2025; value, size, investment, momentum, and reversal are dead or marginal. Our own data concurs: momentum is dead net of cost, low-vol is negative, and the only positives are short-term reversal (a liquidity-provision premium) and crypto short-horizon trend. For a participant who actually pays costs, the directional zoo is mostly a selection-and-publication artifact; the lone robust survivor is <em>low-turnover quality</em>.</p>
+</section>
+
+<div class="tldr">
+  <strong>One-line takeaway.</strong> The directional anomaly zoo is largely a replication-crisis artifact for a cost-paying participant: ~half the premium decays post-publication, the median anomaly is sub-floor in the last decade, and high turnover means realistic costs erase most of the rest. Only low-turnover quality survives.
+</div>
+
+<h2 id="intro">1. Introduction</h2>
+<p>Academic finance has published hundreds of cross-sectional return predictors — value, momentum, size, low-volatility/BAB, profitability, reversal, and a long tail of others. If durable directional alpha exists, it should be here. But three forces conspire against the headline numbers: <span class="key">post-publication decay</span> as the trade gets crowded <a href="#r1">[1]</a>, <span class="key">multiple-testing</span> inflation of in-sample significance <a href="#r2">[2]</a>, and <span class="key">transaction costs</span> on high-turnover portfolios <a href="#r5">[5]</a>. This paper quantifies all three on the most comprehensive open dataset available, then checks the verdict on our own data. Following the series (Paper 1: a real premium, untradable; Paper 2: a thin premium, tradable; Paper 3: an illusory edge), we pre-register:</p>
+<ul>
+  <li><span class="key">H1.</span> Most published anomalies do not survive out-of-sample net of costs; the survivor is low-turnover quality/profitability. <em>(Confirmed.)</em></li>
+  <li><span class="key">H2.</span> The publication |t|&gt;2 bar fails under multiple testing, and the premium decays post-publication. <em>(Confirmed — 53% decay; only 61% clear |t|&gt;3.)</em></li>
+  <li><span class="key">H3.</span> Turnover and costs, not signal, decide survival. <em>(Confirmed — 30 bp/month halves the survivors.)</em></li>
+  <li><span class="key">H4.</span> On our own recent data, classic directional factors are dead net of cost; only reversal (liquidity provision) and crypto trend pay. <em>(Confirmed.)</em></li>
+</ul>
+
+<h2 id="data">2. Data &amp; leakage control</h2>
+<p><span class="key">Part A (authoritative):</span> the Open-Source Asset Pricing dataset <a href="#r4">[4]</a> — <span class="key">212 published predictors</span> as monthly equal-weight-decile long-short returns (1926–2024), each tagged with its original in-sample window and <em>t</em>-stat — plus the Ken French factors (through 2026). <span class="key">Part B (our data):</span> price-based factors on the FnSpID daily panel (2016–2020; news+price, no fundamentals locally) and the top-30 crypto daily panel (2023–2026). <span class="key">Leakage control:</span> the out-of-sample window for each predictor begins strictly after its <em>published sample-end year</em>, so &ldquo;OOS&rdquo; is genuinely post-discovery; our-data factors are walk-forward (signal lagged one day). Caveat: the OSAP long-shorts are <em>gross</em> and high-turnover, so the net-of-cost analysis imposes its own cost model (below) — if anything conservative, since EW-decile shorts in small-caps are the most expensive to trade.</p>
+
+<h2 id="method">3. Method</h2>
+<p>For each predictor we measure: in-sample vs out-of-sample mean return and <em>t</em>-stat (the McLean–Pontiff decay); full-sample |t| against the multiple-testing-aware |t|&gt;3 hurdle <a href="#r2">[2]</a>; recent-decade (2015–2024) Sharpe and significance; and a net-of-cost test that subtracts a flat per-month turnover cost (these portfolios rebalance monthly with high turnover, so we sweep 0/30/60 bp/month). Our-data factors are standard cross-sectional dollar-neutral long-shorts (top vs bottom tercile) net of 10 bp/side. The bar for &ldquo;alive&rdquo; is the +0.3-Sharpe mean-reversion floor and |t|&gt;3, not the journal's |t|&gt;2.</p>
+
+<h2 id="results">4. Experiments &amp; results</h2>
+
+<h3>4.1 Anomalies decay ~half out-of-sample (H2)</h3>
+<p>Across the 212 predictors, the mean long-short return falls from <span class="key">0.69%/month in-sample to 0.32%/month out-of-sample — a 53% decline</span> (Figure 1), almost exactly McLean–Pontiff's famous estimate. The <em>sign</em> mostly survives (86% stay positive OOS), but statistical strength does not: only 34% keep |t|&gt;2 and 18% keep |t|&gt;3 out-of-sample.</p>
+<figure>
+  <img src="figures/p4_fig1_decay.png" alt="In-sample vs out-of-sample mean long-short return">
+  <figcaption><strong>Figure 1.</strong> Mean monthly long-short return of 212 published predictors, in-sample (original study window) vs out-of-sample (post-publication). The premium halves — a textbook replication of McLean–Pontiff.</figcaption>
+</figure>
+
+<h3>4.2 The zoo collapses under stricter, recent, cost-aware tests (H1, H3)</h3>
+<p>Stack the hurdles and the zoo evaporates (Figure 2). Of the 212 predictors that were, by definition, significant in publication: 61% clear |t|&gt;3 full-sample; 43% survive a 30 bp/month cost; 42% beat the +0.3 Sharpe floor in the last decade; 18% keep |t|&gt;3 out-of-sample; and <span class="key">just 3% are statistically strong (|t|&gt;3) in the most recent decade</span>. The median recent-decade Sharpe is 0.22 — below the floor a small shop should bother with.</p>
+<figure>
+  <img src="figures/p4_fig2_survival.png" alt="Share of 212 anomalies passing each hurdle">
+  <figcaption><strong>Figure 2.</strong> Share of the 212 published anomalies passing each test. The sign persists (86%), but strength, recency, and cost-realism each cut deeply — only 3% remain statistically strong in the last decade.</figcaption>
+</figure>
+<p>The kill is largely <em>turnover</em>. These EW-decile long-shorts rebalance monthly; at a realistic 30 bp/month the positive fraction drops from 86% to 43%, and at 60 bp/month to 19% (Figure 3). Costs, not signal, decide — exactly the Novy-Marx–Velikov finding <a href="#r5">[5]</a>.</p>
+<figure>
+  <img src="figures/p4_fig3_cost.png" alt="Fraction of anomalies positive vs transaction cost">
+  <figcaption><strong>Figure 3.</strong> Fraction of predictors with positive out-of-sample returns vs the monthly turnover cost. High turnover makes the zoo acutely cost-sensitive.</figcaption>
+</figure>
+
+<h3>4.3 Only the market and quality survive among canonical factors (H1)</h3>
+<p>The Fama–French factors over 2015–2025 tell the same story cleanly (Figure 4): only the <span class="key">market (Sharpe 0.77)</span> and <span class="key">profitability/quality (RMW, 0.39)</span> clear the floor. Value (HML −0.05), size (SMB −0.20), investment (CMA −0.13), momentum (0.25), and reversal (−0.04) are dead or marginal in the last decade. Quality is the lone survivor — and, not coincidentally, the lowest-turnover of the bunch.</p>
+<figure>
+  <img src="figures/p4_fig4_french.png" alt="Fama-French factor Sharpe ratios 2015-2025">
+  <figcaption><strong>Figure 4.</strong> Canonical Fama–French factor Sharpe ratios, 2015–2025. Only the market and quality (RMW) clear the +0.3 floor; the classic value/size/investment premia are dead.</figcaption>
+</figure>
+
+<h3>4.4 Our own data concurs (H4)</h3>
+<p>Built from scratch on our data, net of 10 bp/side, the classic directional factors fail and the survivors are exactly the ones the rest of this series flagged:</p>
+<table>
+  <thead><tr><th>Factor (our data)</th><th>Net Sharpe</th><th>Gross</th><th>Verdict</th></tr></thead>
+  <tbody>
+    <tr><td>Equity momentum 12-1 (2016–20)</td><td class="neg">−0.01</td><td>0.03</td><td>dead (no edge even gross)</td></tr>
+    <tr><td>Equity low-vol (2016–20)</td><td class="neg">−0.92</td><td>−0.91</td><td>negative</td></tr>
+    <tr><td>Equity news-sentiment, contrarian</td><td class="neg">−0.46</td><td>−0.43</td><td>negative</td></tr>
+    <tr><td>Equity short-term reversal (2016–20)</td><td class="pos">+0.86</td><td>1.15</td><td>liquidity provision; cost-fragile*</td></tr>
+    <tr><td>Crypto momentum 30d (2023–26)</td><td class="pos">+0.53</td><td>0.61</td><td>short-horizon trend survives</td></tr>
+    <tr><td>Crypto reversal 7d (2023–26)</td><td class="neg">−0.47</td><td>−0.26</td><td>negative</td></tr>
+  </tbody>
+</table>
+<p style="font-size:13.5px;color:#5b6470;margin-top:-6px">*Equal-weight, small-cap-tilted, high-turnover; 10 bp/side is optimistic for small-caps — properly the subject of Paper 5 (liquidity provision).</p>
+
+<h2 id="discussion">5. Discussion</h2>
+<p>The factor zoo is not fraud; it is a predictable consequence of how research is produced and consumed. Publication selects for low in-sample <em>p</em>-values; with hundreds of tries, many clear |t|&gt;2 by chance. Disclosure then crowds the genuine ones, halving their premium. And the academic long-short ignores the costs that, on high-turnover portfolios, consume most of what remains.</p>
+<blockquote>For a participant who actually pays costs, the directional anomaly zoo is mostly a selection-and-publication artifact. ~Half the premium decays post-publication, the median anomaly is sub-floor in the last decade, the t&gt;2 bar fails multiple testing, and turnover costs erase most of the rest. The lone robust survivor is low-turnover quality.</blockquote>
+<p>This completes the directional half of the program, and it rhymes with the rest. The one equity factor that pays on our data — short-term reversal — is not a directional forecast but a <em>liquidity-provision</em> premium (Paper 5). The one crypto factor that pays — short-horizon trend — echoes Paper 2's funding cross-section. And quality, the lone zoo survivor, wins precisely because it is cheap to hold. Across four papers the throughline is unmistakable: in markets this efficient, <span class="key">out-of-sample discipline and honest cost modeling are the alpha</span> — they are what separate the handful of real edges from the hundreds of fake ones.</p>
+
+<h2 id="limitations">6. Limitations &amp; future work</h2>
+<p><span class="key">Cost model.</span> OSAP returns are gross EW-decile long-shorts; we impose a flat per-month turnover cost rather than each predictor's measured turnover, so the net figures are illustrative (though conservative — these are the most expensive portfolios to trade, and the dedicated net-of-cost OSAP/Chen–Velikov variants reach similar conclusions). <span class="key">Our-data equity ends 2020.</span> The FnSpID price panel stops in 2020, so Part B's equity window is 2016–2020; the recent decade is covered authoritatively by the French factors (through 2025). <span class="key">No fundamentals locally.</span> Value/quality/size are audited via published returns, not rebuilt on our names. <span class="key">Scope.</span> We test the published zoo and standard constructions; a machine-learned combination of weak signals (net of costs and honestly cross-validated) is the one direction with a non-trivial prior, but prior in-house work and the literature both suggest the costs and decay documented here dominate. Quality/profitability — the survivor — deserves a dedicated, cost-and-capacity-aware follow-up.</p>
+
+<h2 id="refs">References</h2>
+<ol class="refs">
+  <li id="r1">R. D. McLean &amp; J. Pontiff (2016). &ldquo;Does Academic Research Destroy Stock Return Predictability?&rdquo; <em>Journal of Finance</em> 71(1).</li>
+  <li id="r2">C. Harvey, Y. Liu &amp; H. Zhu (2016). &ldquo;…and the Cross-Section of Expected Returns.&rdquo; <em>Review of Financial Studies</em> 29(1). (Multiple testing; the |t|&gt;3 hurdle.)</li>
+  <li id="r3">K. Hou, C. Xue &amp; L. Zhang (2020). &ldquo;Replicating Anomalies.&rdquo; <em>Review of Financial Studies</em> 33(5).</li>
+  <li id="r4">A. Y. Chen &amp; T. Zimmermann (2022). &ldquo;Open Source Cross-Sectional Asset Pricing.&rdquo; <em>Critical Finance Review</em> (openassetpricing.com).</li>
+  <li id="r5">R. Novy-Marx &amp; M. Velikov (2016). &ldquo;A Taxonomy of Anomalies and Their Trading Costs.&rdquo; <em>Review of Financial Studies</em> 29(1).</li>
+  <li id="r6">E. Fama &amp; K. French (2015). &ldquo;A Five-Factor Asset Pricing Model.&rdquo; <em>Journal of Financial Economics</em> 116(1).</li>
+  <li id="r7">B. Vine (2026). &ldquo;The Volatility Risk Premium,&rdquo; &ldquo;Crypto Carry,&rdquo; &ldquo;Statistical Arbitrage in Crypto.&rdquo; <em>Alpha Research</em>, Papers 1–3.</li>
+</ol>
+
+<footer>
+  <p>Part of the <a href="index.html">Alpha Research</a> series. Code, configs, figures, and the complete dated research log:
+  <a href="https://github.com/bryanvine/alpha-research" target="_blank" rel="noopener">github.com/bryanvine/alpha-research</a>.
+  All experiments are leak-controlled and reproducible from raw data. © 2026 Bryan Vine.</p>
+</footer>
+
+</div>
+</body>
+</html>

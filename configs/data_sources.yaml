@@ -301,3 +301,56 @@ crypto_funding_backfill:
     - "MATICUSDT: perp funding rows continue to 2026-05-31 but are PINNED to the flat default +0.0001/8h from ~2024-10 onward (no real price discovery) and the MATICUSDT SPOT pair delisted 2024-09-10 (MATIC->POL rename). Treat MATIC carry as effectively ENDING ~2024-09; POLUSDT exists in the archive if a continuation is wanted."
   profile: /apps/alpha-research/research/paper2_data_profile.md
   refresh: "Re-run `./.venv/bin/python scripts/11_backfill_funding.py [--workers N]` (idempotent; overwrites). Polite: small per-request sleep + concurrency-limited."
+
+# =============================================================================
+# (APPENDED 2026-06-17). Fetcher: scripts/16_fetch_factor_zoo.py
+# Purpose: PUBLISHED-FACTOR BENCHMARK for Paper #4 ("The Cost of Direction" — a
+# net-of-cost / out-of-sample audit of the directional anomaly zoo). Two pillars:
+# (a) the Chen–Zimmermann Open-Source Asset Pricing replication zoo (long-short
+# RETURNS for ~200 published predictors + their metadata), and (b) the Ken French
+# factors as the canonical OOS yardstick. UNITS: every stored series is DECIMAL
+# (raw OSAP & French returns are in PERCENT; both divided by 100 on write).
+# =============================================================================
+equity_factor_zoo:
+  path: /apps/alpha-research/data/equity_factors/
+  verified: true   # acquired, parsed, units-checked & cross-referenced 2026-06-17
+  used_for: "Paper #4 — directional anomaly-zoo audit (how many published long-short predictors survive OOS and net of trading costs)."
+  fetcher: scripts/16_fetch_factor_zoo.py
+  profile: /apps/alpha-research/research/paper4_data_profile.md
+  manifest: /apps/alpha-research/data/equity_factors/_paper4_manifest.json
+  units_note: "ALL stored returns are DECIMAL. OSAP long-short returns and French factors both ship in PERCENT in source; the fetcher divides by 100. (Sanity: Mkt-RF=7.17%/yr, RF=4.36%/yr, avg OSAP predictor=6.0%/yr annualized — single-digit => decimal confirmed.)"
+
+  sources:
+
+    open_source_asset_pricing:
+      provider: "Chen & Zimmermann — Open-Source Asset Pricing (openassetpricing.com); GitHub OpenSourceAP/CrossSection."
+      acquired_via: "Dedicated 'Download' page Google-Drive files fetched directly with requests (large-file confirm-token handling). The pip `openassetpricing` package (module openassetpricing, class openassetpricing.OpenAP) is the fallback path."
+      package_quirks: "(1) `pip install openassetpricing` (v0.0.2) DOWNGRADES the venv pandas 3.0.3 -> 2.2.3 (it pins pandas<3) and pulls in polars/wrds/sqlalchemy/ipython. pyarrow/numpy/requests unaffected. (2) OpenAP(release_year=...) needs the RELEASE TAG not a plain year — valid tags: 2022, 2023, 202408, 202410, 202510; OpenAP(2025) raises TypeError. We pin 202510 (v2.00, 2025-10). (3) The package's dl_port('op') pulls the big 212-portfolio PredictorPortsFull.csv whose Drive file was QUOTA-WALLED ('Too many users have viewed or downloaded this file recently') during this run — which is WHY we prefer the smaller dedicated wide file (separate file_id, separate quota bucket). dl_all_signals/dl_signal need WRDS/CRSP creds; we do NOT use them (we want returns, not firm signals)."
+      files:
+        - "oap_ls_returns.parquet — date x predictor WIDE long-short monthly returns, DECIMAL. DatetimeIndex 'date' (month-end), 1188 months 1926-01-31 .. 2024-12-31, 212 predictor columns (OSAP Acronyms; all 212 are Cat.Signal=='Predictor'). Source file = PredictorLSretWide.csv ('Monthly long-short returns (wide csv)' on the Download page), values originally PERCENT -> /100. ~31% of cells NaN by design (predictors have staggered start dates: 27 reach back to 1926, most begin 1951+/1963+/1972+; only 3 fully populated from 1926). NOTE the return tail ends 2024-12 (this is the v1.41/Oct-2024 portfolio vintage of the wide file)."
+        - "oap_signaldoc.csv — predictor METADATA, 331 rows x 28 cols (verbatim from SignalDoc.csv). Key cols: Acronym, Cat.Signal (Predictor=212 / Placebo=114 / Drop=5 — NOTE the v2 schema uses Predictor/Placebo/Drop, NOT the older clear/likely/maybe), SampleStartYear (1926-2002) & SampleEndYear (1968-2014; original in-sample window -> everything after is OOS room), T-Stat (original published t; median |t|=4.0 for Predictors), Sign (+1/-1 long-short direction), plus Authors/Year/Journal/LongDescription/Cat.* taxonomy/GScholarCites. All 212 traded predictors are documented (212/212 Acronym match)."
+      drive_fileids_used:
+        ls_returns_PredictorLSretWide: "10sOryk_ddjkXagaajTKUk1nwJs2ZLRiI  (https://drive.google.com/file/d/10sOryk_ddjkXagaajTKUk1nwJs2ZLRiI/view)"
+        signaldoc: "1Sev9s6cPFUGgxp1pFiej0lGzpsMqJCI2  (https://drive.google.com/file/d/1Sev9s6cPFUGgxp1pFiej0lGzpsMqJCI2/view)"
+        portfolios_full_212_QUOTA_WALLED: "1g7w-yQ6Cg2qbMEkER9Q3vgns4JszXQo6  (PredictorPortsFull.csv — all portfolio legs incl deciles; blocked by Drive quota this run, not downloaded)"
+        release_folder_v2_2025_10: "https://drive.google.com/drive/folders/1qQDuTsnyvWfEJR6nPBQZ8xxlq6bkLG_y"
+      manual_fallback: "If both the dedicated Drive file AND the pip package are quota-walled, fetch PredictorLSretWide.csv + SignalDoc.csv by hand from https://www.openassetpricing.com/data/ and drop them in this dir; the parquet step in scripts/16_fetch_factor_zoo.py will re-normalize them."
+
+    ken_french_data_library:
+      provider: "Ken French Data Library, Tuck School / Dartmouth (free, no API key). Built from the 202604 CRSP database."
+      acquired_via: "requests GET of the monthly CSV zips; parse ONLY the leading monthly block (YYYYMM,vals in PERCENT), ignore the annual block after the first blank line; /100 -> DECIMAL."
+      files:
+        - "famafrench_monthly.parquet — date x factor monthly, DECIMAL. DatetimeIndex 'date' (month-end), 1203 months 1926-02-28 .. 2026-04-30, 9 factors: Mkt-RF, SMB, HML, RMW, CMA, RF, Mom, ST_Rev, LT_Rev."
+      factor_spans:
+        "Mkt-RF,SMB,HML,RMW,CMA,RF": "1963-07 .. 2026-04 (754 mo) — 5-factor 2x3 set; RMW/CMA (and thus the 5-factor benchmark) only begin 1963-07."
+        Mom:    "1927-01 .. 2026-04 (1192 mo) — F-F Momentum Factor."
+        ST_Rev: "1926-02 .. 2026-04 (1203 mo) — F-F Short-Term Reversal."
+        LT_Rev: "1931-01 .. 2026-04 (1144 mo) — F-F Long-Term Reversal."
+      source_urls:
+        five_factor: "https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/ftp/F-F_Research_Data_5_Factors_2x3_CSV.zip"
+        momentum:    "https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/ftp/F-F_Momentum_Factor_CSV.zip"
+        st_reversal: "https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/ftp/F-F_ST_Reversal_Factor_CSV.zip"
+        lt_reversal: "https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/ftp/F-F_LT_Reversal_Factor_CSV.zip"
+
+  overlap: "OSAP returns ∩ French factors = 1187 months, 1926-02 .. 2024-12 (the binding overlap end is the OSAP wide-file tail 2024-12; French runs to 2026-04). For the 5-factor risk-model benchmark the common span is 1963-07 .. 2024-12."
+  refresh: "Re-run `./.venv/bin/python scripts/16_fetch_factor_zoo.py` (idempotent; overwrites). Network is Python-only on this host (bash sandbox has no egress). If OSAP Drive is quota-walled, retry later or use the manual_fallback above."
