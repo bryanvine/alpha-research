@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Liquidity Provision as Alpha — Alpha Research</title>
+<meta name="description" content="Standalone HFT/market-making alpha is structurally unavailable to a small participant. But microstructure pays twice: execution-cost reduction (~13% less slippage) and the vol-conditional liquidity-provision premium (reversal).">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="apple-touch-icon" href="favicon-180.png">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Liquidity Provision as Alpha: Execution, Order Flow, and the Limits of Microstructure">
+<meta property="og:description" content="OFI explains the present, not the future; the SPY half-spread is 0.09bp (an HFT-only game). Microstructure's real value is execution-cost reduction and the vol-conditional liquidity-provision premium.">
+<meta property="og:url" content="https://bryanvine.github.io/alpha-research/paper5.html">
+<meta property="og:image" content="https://bryanvine.github.io/alpha-research/og-liquidity.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<script>
+  MathJax = { tex: { inlineMath: [['$','$']] }, svg: { fontCache: 'global' } };
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+  :root{ --ink:#1a1a1a; --muted:#5b6470; --rule:#e3e6ea; --accent:#1f6feb; --bg:#fdfdfc; --code:#f5f6f8; }
+  *{ box-sizing:border-box; }
+  html{ -webkit-text-size-adjust:100%; }
+  body{ margin:0; background:var(--bg); color:var(--ink);
+        font:17px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif; }
+  .wrap{ max-width:820px; margin:0 auto; padding:48px 22px 96px; }
+  header.title{ border-bottom:3px solid var(--ink); padding-bottom:22px; margin-bottom:8px; }
+  h1{ font-size:30px; line-height:1.25; margin:0 0 14px; letter-spacing:-0.01em; }
+  .byline{ color:var(--muted); font-size:15px; }
+  .byline a{ color:var(--accent); text-decoration:none; }
+  .tag{ display:inline-block; font-size:12px; font-weight:600; letter-spacing:.04em; text-transform:uppercase;
+        color:#fff; background:var(--accent); padding:2px 9px; border-radius:99px; margin-bottom:14px; }
+  h2{ font-size:22px; margin:46px 0 12px; padding-top:8px; letter-spacing:-0.01em; }
+  h3{ font-size:18px; margin:30px 0 8px; color:#222; }
+  h4{ font-size:15px; margin:20px 0 6px; color:#333; font-weight:600; }
+  p,li{ color:#23262b; }
+  a{ color:var(--accent); }
+  .abstract{ background:#f7f9fb; border:1px solid var(--rule); border-left:4px solid var(--accent);
+             border-radius:8px; padding:18px 22px; margin:26px 0 8px; font-size:16px; }
+  .abstract h3{ margin:0 0 8px; font-size:14px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); }
+  .tldr{ background:#fff8e6; border:1px solid #f2e2af; border-radius:8px; padding:14px 20px; margin:22px 0; }
+  table{ border-collapse:collapse; width:100%; margin:18px 0; font-size:14.5px; }
+  th,td{ border-bottom:1px solid var(--rule); padding:8px 10px; text-align:right; }
+  th:first-child,td:first-child{ text-align:left; }
+  thead th{ border-bottom:2px solid #cfd5dc; font-size:13px; color:var(--muted); text-transform:uppercase; letter-spacing:.03em; }
+  tbody tr:hover{ background:#f7f9fb; }
+  .pos{ color:#137a3e; font-variant-numeric:tabular-nums; }
+  .neg{ color:#b3261e; font-variant-numeric:tabular-nums; }
+  td{ font-variant-numeric:tabular-nums; }
+  figure{ margin:26px 0; text-align:center; }
+  figure img{ max-width:100%; border:1px solid var(--rule); border-radius:8px; background:#fff; }
+  figcaption{ color:var(--muted); font-size:13.5px; margin-top:8px; text-align:left; }
+  code{ background:var(--code); padding:1px 5px; border-radius:4px; font-size:14px;
+        font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace; }
+  .key{ font-weight:600; }
+  blockquote{ margin:18px 0; padding:2px 0 2px 18px; border-left:3px solid var(--accent);
+              color:#2a2e34; font-style:italic; }
+  hr{ border:0; border-top:1px solid var(--rule); margin:40px 0; }
+  ol.refs{ font-size:14.5px; color:#33373d; }
+  ol.refs li{ margin:7px 0; }
+  footer{ margin-top:54px; padding-top:18px; border-top:1px solid var(--rule); color:var(--muted); font-size:13.5px; }
+  .nav{ font-size:13.5px; color:var(--muted); margin:18px 0 0; }
+  .nav a{ margin-right:14px; white-space:nowrap; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="title">
+  <div class="tag">Alpha Research · Paper 5</div>
+  <h1>Liquidity Provision as Alpha: Execution, Order Flow, and the Limits of Microstructure</h1>
+  <p class="byline">
+    <strong>Bryan Vine</strong> · June 17, 2026 ·
+    <a href="https://github.com/bryanvine/alpha-research" target="_blank" rel="noopener">code &amp; full research log ↗</a> ·
+    <a href="index.html">← Alpha Research series</a>
+  </p>
+  <p class="nav">
+    <a href="#abstract">Abstract</a><a href="#intro">1 Introduction</a><a href="#data">2 Data</a><a href="#method">3 Method</a><a href="#results">4 Results</a><a href="#discussion">5 Discussion</a><a href="#limitations">6 Limitations</a><a href="#refs">References</a>
+  </p>
+</header>
+
+<section class="abstract" id="abstract">
+  <h3>Abstract</h3>
+  <p>Limit-order-book microstructure is where high-frequency firms make money, so it is the obvious last place to look for alpha. Using 5.24M SPY 100ms order-book snapshots (Nov–Dec 2025), we ask what a non-colocated participant can actually capture. The answer reframes &ldquo;microstructure alpha.&rdquo; Order-flow imbalance (OFI) explains <span class="key">41% of contemporaneous</span> mid-price moves but essentially <span class="key">nothing forward</span> (R² 0.0009 at 0.1s, ~0 by 5s); a marketable strategy on it loses (−0.18 bps). Standalone market-making is structurally unavailable: SPY's half-spread is just <span class="key">0.093 bps</span> (~1 cent on $600) with no measurable 5-second adverse selection — a sub-0.1-bp game won by queue priority, rebates, and colocation, not by a small participant (and a proper fill/adverse-selection model needs trade-level data we flag as out of scope). But microstructure does pay, in two honest ways. First, as an <span class="key">execution overlay</span>: gating entries on the micro-price cuts effective slippage by <span class="key">~13%</span> versus an immediate market order — which lifts the net return of every other strategy. Second, as a <span class="key">lower-frequency liquidity-provision premium</span>: short-term reversal, the act of supplying liquidity, earns a Sharpe of <span class="key">0.42 in calm markets and 1.16 in high-VIX regimes</span> — exactly Nagel's evaporating-liquidity premium, and the one form a non-HFT can actually harvest. Microstructure is not a source of directional alpha; it is an execution edge and a volatility-conditional risk premium.</p>
+</section>
+
+<div class="tldr">
+  <strong>One-line takeaway.</strong> Standalone HFT/market-making alpha is structurally unavailable (a sub-0.1-bp game), and OFI predicts the present not the future — but microstructure pays twice: as an execution overlay (~13% less slippage) and as the vol-conditional liquidity-provision premium (reversal, Sharpe 0.42→1.16).
+</div>
+
+<h2 id="intro">1. Introduction</h2>
+<p>The previous four papers searched for directional and risk-premium edges. This one turns to the order book itself — order-flow imbalance, the micro-price, the bid-ask spread — and asks the question honestly from the seat of a participant who is <em>not</em> a colocated HFT: what here is real, and what is capturable? We separate four distinct claims, and report what the data shows even where it diverges from the textbook:</p>
+<ul>
+  <li><span class="key">H1.</span> Standalone market-making (capturing the spread) is structurally unavailable to a non-HFT. <em>(Confirmed — the spread is a sub-0.1-bp game.)</em></li>
+  <li><span class="key">H2.</span> OFI is contemporaneous, not predictive; a taker on it loses. <em>(Confirmed cleanly.)</em></li>
+  <li><span class="key">H3.</span> The micro-price works as an execution overlay, reducing slippage. <em>(Confirmed — ~13%.)</em></li>
+  <li><span class="key">H4.</span> The capturable liquidity-provision premium is lower-frequency reversal, rising with volatility. <em>(Confirmed — Sharpe 0.42→1.16.)</em></li>
+</ul>
+
+<h2 id="data">2. Data &amp; leakage control</h2>
+<p><span class="key">Order book:</span> raw 10-level SPY snapshots at 100ms, 28 trading days (Nov–Dec 2025), <span class="key">5.24M snapshots</span> after restricting to regular hours (14:30–21:00 UTC) and filtering crossed/auction/wide quotes. <span class="key">Reversal/VIX:</span> the FnSpID equity panel (short-term reversal) and FRED VIX. All measurements are causal: OFI at a snapshot uses only that snapshot and the prior one; predictive R² and the execution overlay use strictly forward windows; the reversal signal is lagged one day. <span class="key">Key data limitation:</span> we use book <em>snapshots</em>, not the trade tape — so we cannot compute a true realized-spread / queue-position fill model (Moallemi–Yuan). That is exactly why standalone market-making is assessed structurally rather than simulated; a proper fill model needs the Databento ITCH trade messages (future work).</p>
+
+<h2 id="method">3. Method</h2>
+<p>From the best bid/ask we compute order-flow imbalance (Cont–Kukanov–Stoikov <a href="#r1">[1]</a>) and the imbalance-tilted micro-price (Stoikov <a href="#r2">[2]</a>, $\text{micro}=\text{mid}+(I-\tfrac12)\,\text{spread}$ with $I=q^b/(q^b+q^a)$). We then run four tests: (H2) R² of OFI against the contemporaneous mid change vs against forward mid changes at 0.1–30s, and a taker strategy that trades sign(OFI) net of the full spread; (H1) the gross maker capture (the half-spread) and its 5-second mark-to-mid (an adverse-selection proxy); (H3) the effective cost of buying via an immediate market order vs a micro-price-gated rule (cross now if the micro-price signals a rising mid, else wait); and (H4) the short-term-reversal long-short Sharpe split by VIX regime. The bar is the +0.3 Sharpe floor and net-of-cost honesty.</p>
+
+<h2 id="results">4. Experiments &amp; results</h2>
+
+<h3>4.1 Order flow explains the present, not the future (H2)</h3>
+<p>OFI is powerfully <em>contemporaneous</em> — it explains 41% of same-tick mid moves — and almost perfectly <em>un</em>predictive: its R² against future mid moves is 0.0009 at the next tick and indistinguishable from zero by 5 seconds (Figure 1). Consistent with that, a marketable strategy trading sign(OFI) and paying the spread nets <span class="key">−0.18 bps</span>. There is no directional alpha in order flow for someone who must cross the spread.</p>
+<figure>
+  <img src="figures/p5_fig1_ofi.png" alt="OFI R-squared contemporaneous vs forward horizons">
+  <figcaption><strong>Figure 1.</strong> R² of order-flow imbalance against the mid-price move, contemporaneously (41%) and at forward horizons (≈0). OFI is a description of the current move, not a forecast of the next one.</figcaption>
+</figure>
+
+<h3>4.2 Standalone market-making is structurally unavailable (H1)</h3>
+<p>Could one instead earn the spread as a passive maker? The gross prize is tiny: SPY's half-spread averages <span class="key">0.093 bps</span> — about one cent on a $600 share. Marking simulated passive fills to the mid 5 seconds later shows <em>no</em> measurable adverse selection (the effect is a favorable +0.012 bps, since the SPY mid is a 100ms martingale, per §4.1). But that figure assumes fills on demand, which is the fiction: at the touch you sit behind a deep queue, and the orders that <em>do</em> fill are selected by informed flow. Capturing a 0.093-bp edge is a sub-0.1-bp contest decided by queue priority, exchange rebates, and colocation latency — the province of a handful of HFT firms <a href="#r5">[5]</a>, not a small participant. Honestly modelling the fills (realized spread, queue value <a href="#r4">[4]</a>) requires the trade tape we do not use here; what we can say from the book alone is that the prize is too small and too contested to be a standalone edge.</p>
+
+<h3>4.3 The micro-price is an execution edge (H3)</h3>
+<p>Reframed as <em>execution</em> rather than alpha, microstructure pays. Gating a buy on the micro-price — cross immediately when it signals a rising mid, wait when it signals a falling one — cuts the effective cost from <span class="key">0.093 to 0.081 bps, a 13% reduction</span> versus an immediate market order (Figure 2). It is not a strategy on its own, but it lifts the net return of every other strategy in this series, and it is the genuine, capturable use of order-book information.</p>
+<figure>
+  <img src="figures/p5_fig2_overlay.png" alt="Execution cost: immediate vs micro-price overlay">
+  <figcaption><strong>Figure 2.</strong> Effective execution cost of buying SPY: an immediate market order vs a micro-price-gated overlay. The overlay shaves ~13% of the (already small) slippage — microstructure's real, harvestable use.</figcaption>
+</figure>
+
+<h3>4.4 The capturable premium is vol-conditional liquidity provision (H4)</h3>
+<p>Where, then, can a non-HFT actually be paid for providing liquidity? At lower frequency. Short-term reversal — buying what just fell, selling what just rose — <em>is</em> the act of supplying liquidity, and it earns a Sharpe of <span class="key">0.42 in low-VIX regimes and 1.16 in high-VIX regimes</span> (Figure 3). That conditional pattern is Nagel's <a href="#r3">[3]</a> evaporating-liquidity premium: when volatility spikes and fast liquidity withdraws, the compensation for supplying it rises. This is the same liquidity-provision thread that surfaced as the lone positive equity factor in Paper 4 — and it is capturable precisely because it lives at the daily horizon, not in the sub-second queue.</p>
+<figure>
+  <img src="figures/p5_fig3_reversal_vix.png" alt="Reversal Sharpe by VIX regime">
+  <figcaption><strong>Figure 3.</strong> Short-term reversal Sharpe by VIX regime. The liquidity-provision premium more than doubles in high-volatility periods — the honest, harvestable form of &ldquo;making markets.&rdquo;</figcaption>
+</figure>
+
+<h4>Where microstructure pays — and doesn't</h4>
+<table>
+  <thead><tr><th>Use of order-book information</th><th>Verdict</th></tr></thead>
+  <tbody>
+    <tr><td>Standalone market-making (capture the spread)</td><td class="neg">✗ structurally unavailable (0.09 bp, HFT-only)</td></tr>
+    <tr><td>Directional prediction from OFI</td><td class="neg">✗ contemporaneous, not predictive; taker −0.18 bp</td></tr>
+    <tr><td>Execution-cost reduction (micro-price overlay)</td><td class="pos">✓ ~13% less slippage</td></tr>
+    <tr><td>Vol-conditional liquidity provision (reversal)</td><td class="pos">✓ Sharpe 0.42 → 1.16 with VIX</td></tr>
+  </tbody>
+</table>
+
+<h2 id="discussion">5. Discussion</h2>
+<p>&ldquo;Microstructure alpha&rdquo; conflates three different things, and separating them dissolves the confusion. As <em>directional prediction</em>, order flow is a mirror, not a crystal ball — it describes the move happening now and forecasts nothing. As <em>spread capture</em>, market-making is real but is a latency-and-rebate contest at the 0.1-bp scale, structurally closed to anyone without colocation and queue priority. What remains is genuinely useful and genuinely available:</p>
+<blockquote>Microstructure is not a source of directional alpha for a non-HFT participant. It is an execution edge — the micro-price cuts ~13% of slippage — and a volatility-conditional risk premium — liquidity provision via reversal, paid most when volatility spikes.</blockquote>
+<p>This is the fitting close to the program's empirical arc. The execution overlay is the multiplier that makes every other paper's net numbers a little better. And the liquidity-provision premium is the same signal that was the lone equity survivor in Paper 4 and that rhymes with the cross-sectional carry of Paper 2 — a recurring lesson that the durable edges are <em>risk premia for providing something</em> (liquidity, insurance, financing), not forecasts of direction. Across five papers the throughline holds: in markets this efficient, honest cost-and-structure modelling is what separates the few real edges from the many illusory ones.</p>
+
+<h2 id="limitations">6. Limitations &amp; future work</h2>
+<p><span class="key">Snapshots, not trades.</span> The decisive limitation: we use 100ms book snapshots, not the trade tape, so we cannot build a true realized-spread / queue-position fill model — which is why §4.2 argues structurally rather than simulating maker P&amp;L. Parsing the Databento ITCH trade messages (56 GB on hand) to compute realized vs effective spread and a Moallemi–Yuan queue model is the clear next step, and would sharpen — not, we expect, overturn — the structural-unavailability conclusion. <span class="key">Scope.</span> SPY only, 28 days; QQQ and a longer window are straightforward extensions. <span class="key">OFI depth.</span> We use best-level (L1) OFI; the multi-level integrated OFI would raise the contemporaneous R² (toward the 65–85% in the literature) but not its zero predictive power. <span class="key">Reversal data.</span> The vol-conditional reversal uses the 2016–2020 equity panel; the pattern is robust in the literature, but a recent-data and intraday version (and an explicit small-cap cost model) would strengthen the harvestability claim. <span class="key">Capacity.</span> The execution overlay's value is real but bounded by the spread itself — larger for less-liquid names, negligible for SPY.</p>
+
+<h2 id="refs">References</h2>
+<ol class="refs">
+  <li id="r1">R. Cont, A. Kukanov &amp; S. Stoikov (2014). &ldquo;The Price Impact of Order Book Events.&rdquo; <em>Journal of Financial Econometrics</em> 12(1). (Order-flow imbalance.)</li>
+  <li id="r2">S. Stoikov (2018). &ldquo;The Micro-Price: A High-Frequency Estimator of Future Prices.&rdquo; <em>Quantitative Finance</em> 18(12).</li>
+  <li id="r3">S. Nagel (2012). &ldquo;Evaporating Liquidity.&rdquo; <em>Review of Financial Studies</em> 25(7). (Short-term reversal as the liquidity-provision premium; rises with VIX.)</li>
+  <li id="r4">C. Moallemi &amp; K. Yuan (2016). &ldquo;A Model for Queue Position Valuation in a Limit Order Book.&rdquo; Working paper, Columbia.</li>
+  <li id="r5">M. Aquilina, E. Budish &amp; P. O'Neill (2022). &ldquo;Quantifying the High-Frequency Trading Arms Race.&rdquo; <em>Quarterly Journal of Economics</em> 137(1).</li>
+  <li id="r6">B. Vine (2026). &ldquo;The Volatility Risk Premium,&rdquo; &ldquo;Crypto Carry,&rdquo; &ldquo;Statistical Arbitrage in Crypto,&rdquo; &ldquo;The Cost of Direction.&rdquo; <em>Alpha Research</em>, Papers 1–4.</li>
+</ol>
+
+<footer>
+  <p>Part of the <a href="index.html">Alpha Research</a> series. Code, configs, figures, and the complete dated research log:
+  <a href="https://github.com/bryanvine/alpha-research" target="_blank" rel="noopener">github.com/bryanvine/alpha-research</a>.
+  All experiments are leak-controlled and reproducible from raw data. © 2026 Bryan Vine.</p>
+</footer>
+
+</div>
+</body>
+</html>
