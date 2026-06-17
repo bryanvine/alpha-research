@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Synthesis: Do the Modest Edges Add Up? — Alpha Research</title>
+<meta name="description" content="Combining the surviving ~0.4-Sharpe premia into one risk-parity book. Four near-uncorrelated edges combine to a net Sharpe of 0.53 — above the QSPIX ceiling, a 1.33x diversification gain — but the premia are decaying. The capstone of the Alpha Research series.">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="apple-touch-icon" href="favicon-180.png">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Synthesis: Do the Modest Edges Add Up? A Diversified Risk-Premium Book">
+<meta property="og:description" content="Four near-uncorrelated ~0.4-Sharpe premia combine to 0.53 net — above the QSPIX 0.41 ceiling, a 1.33x diversification gain. The free lunch is real — but the premia are decaying.">
+<meta property="og:url" content="https://bryanvine.github.io/alpha-research/paper7.html">
+<meta property="og:image" content="https://bryanvine.github.io/alpha-research/og-portfolio.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<script>
+  MathJax = { tex: { inlineMath: [['$','$']] }, svg: { fontCache: 'global' } };
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+  :root{ --ink:#1a1a1a; --muted:#5b6470; --rule:#e3e6ea; --accent:#1f6feb; --bg:#fdfdfc; --code:#f5f6f8; }
+  *{ box-sizing:border-box; }
+  html{ -webkit-text-size-adjust:100%; }
+  body{ margin:0; background:var(--bg); color:var(--ink);
+        font:17px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif; }
+  .wrap{ max-width:820px; margin:0 auto; padding:48px 22px 96px; }
+  header.title{ border-bottom:3px solid var(--ink); padding-bottom:22px; margin-bottom:8px; }
+  h1{ font-size:30px; line-height:1.25; margin:0 0 14px; letter-spacing:-0.01em; }
+  .byline{ color:var(--muted); font-size:15px; }
+  .byline a{ color:var(--accent); text-decoration:none; }
+  .tag{ display:inline-block; font-size:12px; font-weight:600; letter-spacing:.04em; text-transform:uppercase;
+        color:#fff; background:var(--accent); padding:2px 9px; border-radius:99px; margin-bottom:14px; }
+  h2{ font-size:22px; margin:46px 0 12px; padding-top:8px; letter-spacing:-0.01em; }
+  h3{ font-size:18px; margin:30px 0 8px; color:#222; }
+  p,li{ color:#23262b; }
+  a{ color:var(--accent); }
+  .abstract{ background:#f7f9fb; border:1px solid var(--rule); border-left:4px solid var(--accent);
+             border-radius:8px; padding:18px 22px; margin:26px 0 8px; font-size:16px; }
+  .abstract h3{ margin:0 0 8px; font-size:14px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); }
+  .tldr{ background:#fff8e6; border:1px solid #f2e2af; border-radius:8px; padding:14px 20px; margin:22px 0; }
+  table{ border-collapse:collapse; width:100%; margin:18px 0; font-size:14.5px; }
+  th,td{ border-bottom:1px solid var(--rule); padding:8px 10px; text-align:right; }
+  th:first-child,td:first-child{ text-align:left; }
+  thead th{ border-bottom:2px solid #cfd5dc; font-size:13px; color:var(--muted); text-transform:uppercase; letter-spacing:.03em; }
+  tbody tr:hover{ background:#f7f9fb; }
+  .pos{ color:#137a3e; font-variant-numeric:tabular-nums; }
+  .neg{ color:#b3261e; font-variant-numeric:tabular-nums; }
+  td{ font-variant-numeric:tabular-nums; }
+  figure{ margin:26px 0; text-align:center; }
+  figure img{ max-width:100%; border:1px solid var(--rule); border-radius:8px; background:#fff; }
+  figcaption{ color:var(--muted); font-size:13.5px; margin-top:8px; text-align:left; }
+  code{ background:var(--code); padding:1px 5px; border-radius:4px; font-size:14px;
+        font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace; }
+  .key{ font-weight:600; }
+  blockquote{ margin:18px 0; padding:2px 0 2px 18px; border-left:3px solid var(--accent);
+              color:#2a2e34; font-style:italic; }
+  hr{ border:0; border-top:1px solid var(--rule); margin:40px 0; }
+  ol.refs{ font-size:14.5px; color:#33373d; }
+  ol.refs li{ margin:7px 0; }
+  footer{ margin-top:54px; padding-top:18px; border-top:1px solid var(--rule); color:var(--muted); font-size:13.5px; }
+  .nav{ font-size:13.5px; color:var(--muted); margin:18px 0 0; }
+  .nav a{ margin-right:14px; white-space:nowrap; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="title">
+  <div class="tag">Alpha Research · Paper 7 · Synthesis</div>
+  <h1>Synthesis: Do the Modest Edges Add Up? A Diversified Risk-Premium Book</h1>
+  <p class="byline">
+    <strong>Bryan Vine</strong> · June 17, 2026 ·
+    <a href="https://github.com/bryanvine/alpha-research" target="_blank" rel="noopener">code &amp; full research log ↗</a> ·
+    <a href="index.html">← Alpha Research series</a>
+  </p>
+  <p class="nav">
+    <a href="#abstract">Abstract</a><a href="#intro">1 Introduction</a><a href="#data">2 Data</a><a href="#method">3 Method</a><a href="#results">4 Results</a><a href="#discussion">5 Verdict</a><a href="#limitations">6 Limitations</a><a href="#refs">References</a>
+  </p>
+</header>
+
+<section class="abstract" id="abstract">
+  <h3>Abstract</h3>
+  <p>The first six papers found that the durable edges are modest risk premia — each around a 0.4 Sharpe net of costs, none a standalone trade. This synthesis asks the question that matters for actually deploying capital: do they <em>add up</em>? We combine the long-history survivors — FX carry, FX value, equity quality (profitability), and short-term reversal / liquidity provision — into one inverse-volatility, vol-targeted, no-look-ahead book. The answer is a qualified yes. The four sleeves are <span class="key">near-perfectly uncorrelated</span> (all pairwise |ρ| &lt; 0.2), so risk-parity diversification lifts an average sleeve Sharpe of 0.40 to a <span class="key">combined 0.53 — a 1.33× diversification gain that clears the ~0.41 net Sharpe of AQR's live multi-style fund</span> and beats every individual sleeve. Diversification, as advertised, is the closest thing to a free lunch. But two caveats temper it. The premia have <span class="key">collectively decayed</span> — the book's Sharpe ran 0.85 (2000s) and 1.09 (2010s) but only <span class="key">0.13 in the 2020s</span> — and adding the crypto sleeves over their short 2023–2026 overlap (where the equity factors were negative) drags a thin-sample book to −0.16. The honest forward expectation is therefore not the historical 0.53 but something more like 0.3–0.5, fading. This is the program's bottom line: a small, rigorous participant can assemble a diversified book of genuine, modest, decaying risk premia that beats a cash-plus-floor benchmark — not the double-digit Sharpes of the backtests, which were, every one, artifacts.</p>
+</section>
+
+<div class="tldr">
+  <strong>One-line takeaway.</strong> Four near-uncorrelated ~0.4-Sharpe premia combine to a net 0.53 — above the QSPIX ceiling, a 1.33× diversification gain. The free lunch is real; but the premia are decaying (2020s ≈ 0.1), so the honest forward expectation is ~0.3–0.5, not the backtest's double digits.
+</div>
+
+<h2 id="intro">1. Introduction</h2>
+<p>Across six papers a consistent picture emerged: a handful of genuine edges, all modest risk premia clustered around a 0.4 Sharpe, surrounded by a much larger set of illusions. A 0.4-Sharpe sleeve is not, on its own, worth trading for a small participant — the drawdowns are too deep relative to the return. The classical resolution is diversification: combine many <em>uncorrelated</em> modest premia and the portfolio Sharpe scales up even though no single sleeve improves <a href="#r1">[1]</a><a href="#r2">[2]</a>. This is the entire premise of multi-style funds like AQR's QSPIX. So we test it directly on our own survivors:</p>
+<ul>
+  <li><span class="key">H1.</span> The surviving sleeves are near-uncorrelated. <em>(Confirmed — all |ρ| &lt; 0.2.)</em></li>
+  <li><span class="key">H2.</span> A risk-parity combination beats every individual sleeve. <em>(Confirmed — 0.53 vs best 0.43.)</em></li>
+  <li><span class="key">H3.</span> The combined book clears the ~0.41 QSPIX live ceiling. <em>(Confirmed long-run; not recently.)</em></li>
+  <li><span class="key">H4.</span> The premia have decayed, tempering the forward expectation. <em>(Confirmed — 2020s ≈ 0.13.)</em></li>
+</ul>
+
+<h2 id="data">2. Data &amp; leakage control</h2>
+<p>The sleeves are the net-of-cost long-short return series from Papers 1–6: <span class="key">FX carry</span> and <span class="key">FX value</span> (G10, monthly, from Paper 6); <span class="key">equity quality</span> (Fama–French RMW) and <span class="key">short-term reversal / liquidity provision</span> (Fama–French ST_Rev, the Paper-5 premium) — the four with long histories — plus <span class="key">crypto funding carry</span> (Paper 2) and <span class="key">crypto trend</span> (Paper 4) for a recent-window extension. All weighting uses <em>trailing</em> volatility lagged one month, so no future information enters a position; the book is rebalanced monthly and charged a small overlay cost on weight changes.</p>
+
+<h2 id="method">3. Method</h2>
+<p>We use the simplest honest construction: <span class="key">risk parity</span>. Each sleeve is weighted inversely to its trailing 36-month volatility (weights normalized and lagged), so each contributes roughly equal risk; the whole book is then scaled to a 10%/yr volatility target on its own trailing volatility. We deliberately avoid optimizing weights on realized returns — mean-variance optimization on estimated means is the classic overfitting trap, and our whole program argues against trusting in-sample performance. Risk parity needs only the (more stable) covariance structure, and it is what the diversification result should rest on.</p>
+
+<h2 id="results">4. Experiments &amp; results</h2>
+
+<h3>4.1 The sleeves are near-uncorrelated (H1)</h3>
+<p>The precondition for diversification holds emphatically: every pairwise correlation among the four long-history sleeves is between −0.09 and +0.17 (Figure 1). FX carry, FX value, equity quality, and reversal are essentially statistically independent — they are paid for bearing different risks, so they rise and fall at different times. This is exactly the raw material a portfolio needs.</p>
+<figure>
+  <img src="figures/p7_fig1_corr.png" alt="Correlation matrix of the four sleeves, all near zero">
+  <figcaption><strong>Figure 1.</strong> Pairwise correlations of the four long-history sleeves. All |ρ| &lt; 0.2 — near-statistical-independence, the precondition for a diversification gain.</figcaption>
+</figure>
+
+<h3>4.2 Diversification lifts the book above the ceiling (H2, H3)</h3>
+<p>Combining them delivers the textbook result (Figure 2). The individual sleeves earn 0.36–0.43 (average 0.40); the risk-parity book earns <span class="key">0.53</span> — a 1.33× diversification ratio, above every single sleeve and above the ~0.41 a live multi-style fund returns. Nothing here is a strong standalone strategy, yet assembled they clear the bar a real diversified product sets. The free lunch is real.</p>
+<figure>
+  <img src="figures/p7_fig2_diversification.png" alt="Individual sleeve Sharpes vs the combined book">
+  <figcaption><strong>Figure 2.</strong> Long-history net Sharpe of each sleeve and of the combined risk-parity book. Four ~0.4 edges combine to 0.53, above the QSPIX 0.41 ceiling — a 1.33× diversification gain.</figcaption>
+</figure>
+
+<h3>4.3 But the premia are decaying (H4)</h3>
+<p>The qualification is decay (Figure 3). The book's Sharpe by decade ran 0.39 (1990s) → 0.85 (2000s) → 1.09 (2010s) → <span class="key">0.13 (2020s)</span>. The mid-sample numbers are excellent; the current decade is barely above zero — the collective signature of the post-publication and post-financialization decay each earlier paper documented sleeve by sleeve. The crypto-inclusive book makes the point sharper still: over the short 2023–2026 overlap, where FX value, quality, and reversal were all <em>negative</em> and only FX carry (+1.05) and the crypto sleeves (+0.5) were positive, an expected-return-blind risk-parity combine nets −0.16 — too thin and too naive a sample to be a portfolio Sharpe, but a useful reminder that recent realized premia are weak and regime-dependent.</p>
+<figure>
+  <img src="figures/p7_fig3_decay.png" alt="Combined book Sharpe by decade, decaying to 0.13 in the 2020s">
+  <figcaption><strong>Figure 3.</strong> Combined book Sharpe by decade. Diversification worked spectacularly in the 2000s–2010s (0.85, 1.09) but the premia have faded to ~0.13 in the 2020s. The free lunch is shrinking.</figcaption>
+</figure>
+
+<h2 id="discussion">5. The program's verdict</h2>
+<p>This synthesis closes a seven-paper search for harvestable alpha across crypto, equities, FX, commodities, volatility, and microstructure. The conclusion is neither the triumphant &ldquo;we found alpha&rdquo; nor the nihilistic &ldquo;markets are perfectly efficient.&rdquo; It is the honest middle:</p>
+<blockquote>A small, rigorous participant can assemble a diversified book of genuine but modest risk premia — uncorrelated edges of ~0.4 Sharpe that combine to ~0.5, above a live multi-style benchmark. But the premia are decaying, so the honest forward expectation is ~0.3–0.5 and fading — not the double-digit Sharpes of the backtests, which were, without exception, artifacts of selection, smoothness, stale prices, decay, or cost-blindness.</blockquote>
+<p>Three lessons stand. <span class="key">The durable edges are risk premia for providing something</span> — liquidity, insurance, financing — never forecasts of direction, which failed in every market we tested. <span class="key">Diversification is the only real multiplier</span>: no single premium is worth trading alone, but their near-independence is genuine and stacks into a respectable whole. And <span class="key">rigor was the alpha</span>: in paper after paper, the work that paid was not finding a signal but honestly pricing its costs, its decay, and its capacity — the discipline that separated the half-dozen real premia from the hundreds of false ones, and that turned a flattering −1.57 commodity Sharpe, a Sharpe-8 carry artifact, and a 0.41-correlation factor zoo into honest negatives. For a participant without colocation, exchange rebates, or a licensed data moat, that discipline — not a secret signal — is the edge. The modest, diversified, fading book this paper builds is what honest alpha actually looks like.</p>
+
+<h2 id="limitations">6. Limitations &amp; future work</h2>
+<p><span class="key">Equity sleeves use published factors.</span> Quality and reversal are the Fama–French long-shorts (standard, but more frictionless than our own net-of-cost builds); a fully self-built, capacity-aware version would lower their contribution somewhat. <span class="key">Risk parity, not optimization.</span> We deliberately avoid mean-variance optimization (it overfits estimated means); a forward-looking expected-return tilt could help or hurt, and is left out by design. <span class="key">The crypto extension is thin.</span> Forty months is too short for a stable multi-sleeve estimate; the crypto sleeves earn their keep individually (Papers 2, 4) but their portfolio contribution awaits more history. <span class="key">Decay is the real risk.</span> The 2020s Sharpe of 0.13 is the most important number in the paper: a diversified book of decaying premia is still a book of decaying premia, and live deployment should size to the recent, not the historical, regime — and monitor for further erosion. The natural continuation is a live, vol-targeted paper-traded version with capacity and borrow-cost models, tracked forward — the only honest way to learn whether even this modest edge survives contact with the next regime.</p>
+
+<h2 id="refs">References</h2>
+<ol class="refs">
+  <li id="r1">H. Markowitz (1952). &ldquo;Portfolio Selection.&rdquo; <em>Journal of Finance</em> 7(1).</li>
+  <li id="r2">A. Ilmanen (2011). <em>Expected Returns: An Investor's Guide to Harvesting Market Rewards.</em> Wiley.</li>
+  <li id="r3">C. Asness, A. Ilmanen, R. Israel &amp; T. Moskowitz (2015). &ldquo;Investing with Style.&rdquo; <em>Journal of Investment Management</em> 13(1). (The multi-style risk-premia case.)</li>
+  <li id="r4">R. D. McLean &amp; J. Pontiff (2016). &ldquo;Does Academic Research Destroy Stock Return Predictability?&rdquo; <em>Journal of Finance</em> 71(1).</li>
+  <li id="r5">B. Vine (2026). Alpha Research, Papers 1–6 (volatility risk premium; crypto carry; crypto stat-arb; the factor zoo; liquidity provision; FX &amp; commodity carry).</li>
+</ol>
+
+<footer>
+  <p>The capstone of the <a href="index.html">Alpha Research</a> series. Code, configs, figures, and the complete dated research log:
+  <a href="https://github.com/bryanvine/alpha-research" target="_blank" rel="noopener">github.com/bryanvine/alpha-research</a>.
+  All experiments are leak-controlled and reproducible from raw data. © 2026 Bryan Vine.</p>
+</footer>
+
+</div>
+</body>
+</html>
