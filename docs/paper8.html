@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>On-Chain Liquidity and the Crypto Premia: An Autonomous Search — Alpha Research</title>
+<meta name="description" content="An autonomous LLM research loop searched on-chain conditioning overlays and surfaced one promising market-neutral lead: a stablecoin-flow signal that timed the crypto premia (OOS 1.18, 5-day mechanism t=3.22). Extending the window to 2020-2026 revealed it as a fit — the mechanism collapses to noise. A case study in autonomous discovery and honest out-of-window death.">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="apple-touch-icon" href="favicon-180.png">
+<meta property="og:type" content="article">
+<meta property="og:title" content="On-Chain Liquidity and the Crypto Premia: An Autonomous Search and an Out-of-Window Death">
+<meta property="og:description" content="An autonomous LLM research loop found a promising stablecoin-flow overlay on the crypto premia (OOS 1.18, mechanism t=3.22). Extending the window to 2020-2026 killed it: a fit, not an edge. Rigor is the alpha.">
+<meta property="og:url" content="https://bryanvine.github.io/alpha-research/paper8.html">
+<meta property="og:image" content="https://bryanvine.github.io/alpha-research/og-onchain.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<script>
+  MathJax = { tex: { inlineMath: [['$','$']] }, svg: { fontCache: 'global' } };
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+  :root{ --ink:#1a1a1a; --muted:#5b6470; --rule:#e3e6ea; --accent:#1f6feb; --bg:#fdfdfc; --code:#f5f6f8; }
+  *{ box-sizing:border-box; }
+  html{ -webkit-text-size-adjust:100%; }
+  body{ margin:0; background:var(--bg); color:var(--ink);
+        font:17px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif; }
+  .wrap{ max-width:820px; margin:0 auto; padding:48px 22px 96px; }
+  header.title{ border-bottom:3px solid var(--ink); padding-bottom:22px; margin-bottom:8px; }
+  h1{ font-size:30px; line-height:1.25; margin:0 0 14px; letter-spacing:-0.01em; }
+  .byline{ color:var(--muted); font-size:15px; }
+  .byline a{ color:var(--accent); text-decoration:none; }
+  .tag{ display:inline-block; font-size:12px; font-weight:600; letter-spacing:.04em; text-transform:uppercase;
+        color:#fff; background:var(--accent); padding:2px 9px; border-radius:99px; margin-bottom:14px; }
+  h2{ font-size:22px; margin:46px 0 12px; padding-top:8px; letter-spacing:-0.01em; }
+  h3{ font-size:18px; margin:30px 0 8px; color:#222; }
+  p,li{ color:#23262b; }
+  a{ color:var(--accent); }
+  .abstract{ background:#f7f9fb; border:1px solid var(--rule); border-left:4px solid var(--accent);
+             border-radius:8px; padding:18px 22px; margin:26px 0 8px; font-size:16px; }
+  .abstract h3{ margin:0 0 8px; font-size:14px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); }
+  .tldr{ background:#fff8e6; border:1px solid #f2e2af; border-radius:8px; padding:14px 20px; margin:22px 0; }
+  table{ border-collapse:collapse; width:100%; margin:18px 0; font-size:14.5px; }
+  th,td{ border-bottom:1px solid var(--rule); padding:8px 10px; text-align:right; }
+  th:first-child,td:first-child{ text-align:left; }
+  thead th{ border-bottom:2px solid #cfd5dc; font-size:13px; color:var(--muted); text-transform:uppercase; letter-spacing:.03em; }
+  tbody tr:hover{ background:#f7f9fb; }
+  .pos{ color:#137a3e; font-variant-numeric:tabular-nums; }
+  .neg{ color:#b3261e; font-variant-numeric:tabular-nums; }
+  td{ font-variant-numeric:tabular-nums; }
+  figure{ margin:26px 0; text-align:center; }
+  figure img{ max-width:100%; border:1px solid var(--rule); border-radius:8px; background:#fff; }
+  figcaption{ color:var(--muted); font-size:13.5px; margin-top:8px; text-align:left; }
+  code{ background:var(--code); padding:1px 5px; border-radius:4px; font-size:14px;
+        font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace; }
+  .key{ font-weight:600; }
+  blockquote{ margin:18px 0; padding:2px 0 2px 18px; border-left:3px solid var(--accent);
+              color:#2a2e34; font-style:italic; }
+  hr{ border:0; border-top:1px solid var(--rule); margin:40px 0; }
+  ol.refs{ font-size:14.5px; color:#33373d; }
+  ol.refs li{ margin:7px 0; }
+  footer{ margin-top:54px; padding-top:18px; border-top:1px solid var(--rule); color:var(--muted); font-size:13.5px; }
+  .nav{ font-size:13.5px; color:var(--muted); margin:18px 0 0; }
+  .nav a{ margin-right:14px; white-space:nowrap; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="title">
+  <div class="tag">Alpha Research · Paper 8 · The Autonomous Researcher</div>
+  <h1>On-Chain Liquidity and the Crypto Premia: An Autonomous Search, and an Honest Out-of-Window Death</h1>
+  <p class="byline">
+    <strong>Bryan Vine</strong> · June 19, 2026 ·
+    <a href="https://github.com/bryanvine/alpha-research" target="_blank" rel="noopener">code &amp; full research log ↗</a> ·
+    <a href="index.html">← Alpha Research series</a>
+  </p>
+  <p class="nav">
+    <a href="#abstract">Abstract</a><a href="#intro">1 Introduction</a><a href="#method">2 The auto-researcher</a><a href="#data">3 Data &amp; hypothesis</a><a href="#results">4 Results</a><a href="#discussion">5 Verdict</a><a href="#limitations">6 Limitations</a><a href="#refs">References</a>
+  </p>
+</header>
+
+<section class="abstract" id="abstract">
+  <h3>Abstract</h3>
+  <p>The first seven papers were written by hand. This one was found by a machine. We built an <span class="key">autonomous research loop</span> — an LLM agent that rewrites a single strategy file, scores it through this program's rigor protocol, and iterates, in the spirit of Karpathy's <em>autoresearch</em> but pointed at market alpha instead of training loss. Crucially, the agent never sees or runs the scorer: a fixed harness owns the evaluation and the global trial count, so the deflated-Sharpe and PBO gates cannot be talked up. Across five campaigns it produced what every prior paper predicted — mostly honest rejections — and one genuinely promising, market-neutral lead worth a full study: an <span class="key">on-chain stablecoin-flow signal</span> (from the free DeFiLlama API) that rotates the crypto carry and trend premia, posting an out-of-sample Sharpe of <span class="key">1.18 vs 0.66</span> for the unconditioned book, with a significant five-day mechanism (<span class="key">rank-IC 0.17, t=3.22</span>), passing deflated Sharpe (0.97) and PBO (0.11) over 2023–2026. It looked real. So we did the one test that matters: we backfilled the crypto sleeves to 2020 — roughly doubling the sample — and re-ran. The edge <span class="key">evaporated</span>. The five-day mechanism collapsed from t=3.22 to <span class="key">t=0.48</span>, its yearly information coefficient flipped sign at random, PBO failed (0.51), and the overlay's apparent t=3.75 turned out to be the sleeves' own base return, not the conditioning. The lead was a 2023–2026 window fit. The headline result of this paper is therefore not a signal but a method: an autonomous searcher that surfaces plausible edges, paired with an out-of-window test that kills the fits before a human can fall in love with them. Rigor, once again, was the alpha.</p>
+</section>
+
+<div class="tldr">
+  <strong>One-line takeaway.</strong> An autonomous LLM research loop found a market-neutral on-chain overlay that doubled the crypto book's in-window Sharpe with a significant 5-day mechanism — and extending the window to 2020–2026 revealed it as a fit (mechanism t=3.22→0.48, PBO 0.11→0.51). The system's value is the honest kill, not the find.
+</div>
+
+<h2 id="intro">1. Introduction</h2>
+<p>Seven papers of hand-built research converged on one uncomfortable regularity: nearly every spectacular backtest in this program was an artifact, and the work that paid was not finding signals but honestly pricing their costs, decay, and selection. If rigor is the real edge, then the natural next step is to <em>automate the search</em> and let the rigor do the rejecting — at machine scale, without the human attachment that makes a 1.2-Sharpe backtest so hard to throw away.</p>
+<p>So we built one. Modeled on Andrej Karpathy's <em>autoresearch</em> <a href="#r1">[1]</a> — where an LLM agent edits one file, runs a fixed-budget experiment, keeps or discards, and repeats — our <span class="key">auto-researcher</span> swaps "minimize validation loss" for "find net-of-cost, out-of-sample, market-neutral alpha." This paper is its first campaign report. It tests four hypotheses:</p>
+<ul>
+  <li><span class="key">H1.</span> An autonomous loop, gated by this program's rigor protocol, mostly returns honest rejections. <em>(Confirmed — 0 of ~90 candidates passed.)</em></li>
+  <li><span class="key">H2.</span> It can surface a genuinely novel, market-neutral lead a human had not tried. <em>(Confirmed — an on-chain stablecoin-flow overlay.)</em></li>
+  <li><span class="key">H3.</span> The lead is statistically significant in-window. <em>(Confirmed — 5-day mechanism t=3.22, deflated Sharpe 0.97.)</em></li>
+  <li><span class="key">H4.</span> It survives an out-of-window robustness test. <em>(<span class="neg">Falsified</span> — the mechanism collapses on 2020–2022 data.)</em></li>
+</ul>
+
+<h2 id="method">2. The auto-researcher</h2>
+<p>The system has three moving parts, deliberately separated so the search cannot game its own grade. A human-edited <code>program.md</code> states the objective, the data menu, and — most importantly — the program's hard-won list of dead ends (directional prediction fails; smooth-stream Sharpes are artifacts; long-only books are market beta, not alpha). The agent edits exactly one file, <code>factor.py</code>, to express a single hypothesis as a net-of-cost return series. And a <span class="key">fixed harness</span> — which the agent never reads or runs — scores that series through the same gauntlet every paper here had to clear: the mandatory prediction-diversity check, purged / embargoed walk-forward, non-overlapping <em>t</em>-statistics, deflated Sharpe, and PBO via CSCV <a href="#r2">[2]</a><a href="#r3">[3]</a>.</p>
+<p>One design choice is the whole ballgame. In Karpathy's setup the agent runs its own evaluation, which is safe because validation loss is honest. Market backtests are not: an agent that can re-score is just running multiple comparisons, and the False Strategy Theorem guarantees it will manufacture a winner from noise. So here <span class="key">the runner, not the agent, owns the scorer and the global trial counter</span>. Deflated Sharpe is deflated against <em>every</em> factor ever tried in a campaign, the bar rises with every turn, and the agent's only lever is the quality of its next idea. The harness also rejects two failure modes a naive backtester rewards: a near-constant return stream (the smooth-Sharpe trap that sank an earlier in-house system) and a net-directional book across many instruments (market beta wearing an alpha costume). The agent ran on a frontier model and, when its quota ran out, on a local open-source model — the loop is model-agnostic.</p>
+
+<h2 id="data">3. Data &amp; the hypothesis it found</h2>
+<p>Across five campaigns — conditioning the surviving premia, an open-ended sweep, equity point-in-time fundamentals (SEC EDGAR), futures positioning (CFTC COT), and on-chain data (DeFiLlama) — the loop returned what Papers 1–7 would predict: zero passes, a pile of characterized negatives, and the beta gate correctly killing every long-only equity tilt that a raw Sharpe would have flattered. One lead stood out, and it came from data this program had never used: <span class="key">DeFiLlama</span>'s free, keyless on-chain feeds — total stablecoin supply, DeFi total-value-locked, and protocol fees.</p>
+<p>The agent's hypothesis is mechanism-driven, not data-mined. Stablecoin minting is fresh dollars entering crypto; contraction is capital leaving. Expanding on-chain liquidity should favor <span class="key">trend continuation</span> as new money chases winners, while contraction should favor the <span class="key">funding-carry</span> sleeve, where crowded leverage unwinds and financing premia are paid. So it built a market-neutral overlay that keeps the crypto book fully invested but <em>rotates</em> between the carry and trend sleeves (Papers 2 and 4) on a lagged, standardized stablecoin-liquidity score — relative sleeve selection, never a directional exposure bet. No look-ahead: every conditioner is lagged a day and standardized against trailing history.</p>
+
+<h2 id="results">4. Results</h2>
+
+<h3>4.1 In-window, it looks real (H2, H3)</h3>
+<p>Over 2023–2026 (~1,260 days) the overlay is, by every gate, a promising market-neutral edge. It roughly <span class="key">doubles the out-of-sample Sharpe — 1.18 versus 0.66</span> for the unconditioned 50/50 book — and it does so robustly: all eighteen configurations in a pre-registered grid are positive (0.97–1.19), deflated Sharpe is 0.97, and PBO is 0.11. Most convincingly, the <em>mechanism</em> is independently significant: the lagged stablecoin score predicts the five-day trend-minus-carry return spread with a rank-IC of 0.17 at <span class="key">t=3.22</span> (Figure 1, blue) — above this program's demanding <em>t</em>&gt;3 bar. The only blemish is the overlay's own daily <em>t</em> of 2.21: a 1.2-Sharpe strategy simply cannot clear <em>t</em>&gt;3 in three and a half years. That is a sample-length problem, not a strategy problem — which is exactly what makes it worth more data.</p>
+<figure>
+  <img src="figures/p8_fig1_mechanism.png" alt="Spread-timing t-statistic by horizon, in-window vs extended; the 5-day mechanism collapses from 3.22 to 0.48">
+  <figcaption><strong>Figure 1.</strong> Does stablecoin flow predict the trend−carry spread? In-window (blue) the five-day mechanism clears the <em>t</em>&gt;3 bar (3.22). Extending the sample to 2020–2026 (red) collapses every horizon to noise — the 5-day <em>t</em> falls to 0.48.</figcaption>
+</figure>
+
+<h3>4.2 Out-of-window, it dies (H4)</h3>
+<p>So we ran the one test that separates an edge from a fit. We backfilled the Binance USD-M funding and spot panels to 2020 from the public data archive, rebuilt the carry and trend sleeves over the full <span class="key">2,359-day (2020–2026) window</span> — nearly double the data — and re-ran the identical study. The lead did not survive (Table 1). The five-day mechanism collapsed from t=3.22 to <span class="key">t=0.48</span>; its year-by-year information coefficient flips sign essentially at random (Figure 3); PBO failed at <span class="key">0.51</span>; and while the overlay's daily <em>t</em> rose to 3.75, that significance is now the crypto sleeves' own base return, not the conditioning — because the overlay only beats equal-weight by <span class="key">1.42 to 1.26</span> over the long window, versus the 1.18-to-0.66 chasm it showed in-sample (Figure 2). Stripped of the favorable window, the conditioning adds almost nothing.</p>
+
+<table>
+  <thead><tr><th>Metric</th><th>In-window 2023–26</th><th>Extended 2020–26</th></tr></thead>
+  <tbody>
+    <tr><td>Days</td><td>1,263</td><td>2,359</td></tr>
+    <tr><td>Mechanism, 5-day <em>t</em></td><td class="pos">3.22</td><td class="neg">0.48</td></tr>
+    <tr><td>Overlay OOS Sharpe</td><td>1.18</td><td>1.42</td></tr>
+    <tr><td>Equal-weight OOS Sharpe</td><td>0.66</td><td>1.26</td></tr>
+    <tr><td>Overlay edge over EW</td><td class="pos">+0.52</td><td class="neg">+0.16</td></tr>
+    <tr><td>PBO (want &lt; 0.5)</td><td class="pos">0.11</td><td class="neg">0.51</td></tr>
+    <tr><td>Verdict</td><td>promising</td><td class="neg">a fit</td></tr>
+  </tbody>
+</table>
+
+<figure>
+  <img src="figures/p8_fig2_overlay_vs_ew.png" alt="Overlay vs equal-weight OOS Sharpe, in-window vs extended; the edge over equal-weight evaporates">
+  <figcaption><strong>Figure 2.</strong> The overlay's out-of-sample edge over the unconditioned equal-weight book — a ~2× gap in-window (1.18 vs 0.66) — nearly vanishes over the extended sample (1.42 vs 1.26). Most of the long-window Sharpe is the sleeves, not the signal.</figcaption>
+</figure>
+
+<figure>
+  <img src="figures/p8_fig3_ic_by_year.png" alt="Mechanism information coefficient by year over 2020-2026, flipping sign with no durable direction">
+  <figcaption><strong>Figure 3.</strong> The stablecoin→spread rank-IC, year by year over 2020–2026. It flips sign with no durable direction — the signature of noise, not a mechanism. The in-window strength was a property of 2023–2024, not a law of the market.</figcaption>
+</figure>
+
+<h2 id="discussion">5. Verdict</h2>
+<p>The honest headline is a negative, and that is the point. The most promising lead an autonomous searcher produced — market-neutral, mechanism-backed, robust to its own parameter grid, non-decaying within sample — was a fit, and a single out-of-window test said so unambiguously. A human researcher, having watched the loop discover a clean on-chain story with a <em>t</em>=3.22 mechanism, would have been sorely tempted to trade it. The discipline of doubling the sample first is what stood between a plausible narrative and a live loss.</p>
+<blockquote>An autonomous loop is a faster way to generate hypotheses, not a shortcut around rigor. It made the search cheap; it made the rejection mandatory. The system's deliverable is not the edge it found but the fit it killed — and the fact that the killing was automatic, gated, and honest.</blockquote>
+<p>Two findings generalize beyond this one signal. First, <span class="key">the architecture matters</span>: because the agent could not run or see the scorer, and the deflation counted every trial it had ever made, the search could not converge on a noise-mined winner — it had to keep proposing real ideas, and the gate kept saying no until a genuinely interesting one appeared. Second, <span class="key">in-sample significance is not robustness</span>, even when it is deflated, walk-forward, and mechanism-confirmed. A <em>t</em>=3.22 five-day mechanism with PBO 0.11 is exactly the kind of result that survives every test you can run inside a window and still fails the moment you widen it. The cheapest, most decisive rigor test in quantitative research remains the oldest: get more data and look again. This program will keep the auto-researcher running — but it will trust only what survives the window it was not born in.</p>
+
+<h2 id="limitations">6. Limitations &amp; future work</h2>
+<p><span class="key">The sample is still short.</span> Even extended, the crypto sleeves span 2020–2026 with a thin pre-2023 cross-section; some sleeves backfill only to their listing, and 2020–2022 is a single bull-then-bear regime. A genuine on-chain edge could exist at a horizon or in a sub-universe we did not test — absence of evidence here is not proof of its absence. <span class="key">The autonomous search is itself a multiple-comparisons machine.</span> Global deflation guards within a campaign, but cross-campaign and within-turn exploration are only partly accounted for; the honest reading is that the bar should be <em>higher</em>, not lower, for anything a tireless loop surfaces. <span class="key">The local-model runs were weaker.</span> When the frontier-model quota ran out, the open-source fallback build-failed more often and leaned toward beta tilts the gate caught — useful breadth, lower quality. <span class="key">The forward frontier.</span> The most genuinely un-mined data this program owns is the forward Deribit options surface it now collects every six hours; pointing the auto-researcher at a true options-execution test, as it matures, is the natural next campaign. The method is the contribution; the next edge, if there is one, will have to clear the same widening window.</p>
+
+<h2 id="refs">References</h2>
+<ol class="refs">
+  <li id="r1">A. Karpathy (2026). <em>autoresearch</em> — an LLM agent that runs autonomous ML experiments. <a href="https://github.com/karpathy/autoresearch" target="_blank" rel="noopener">github.com/karpathy/autoresearch</a>.</li>
+  <li id="r2">D. Bailey &amp; M. López de Prado (2014). &ldquo;The Deflated Sharpe Ratio: Correcting for Selection Bias, Backtest Overfitting and Non-Normality.&rdquo; <em>Journal of Portfolio Management</em> 40(5).</li>
+  <li id="r3">D. Bailey, J. Borwein, M. López de Prado &amp; Q. Zhu (2017). &ldquo;The Probability of Backtest Overfitting.&rdquo; <em>Journal of Computational Finance</em> 20(4). (PBO via CSCV.)</li>
+  <li id="r4">M. López de Prado (2018). <em>Advances in Financial Machine Learning.</em> Wiley. (Purged / embargoed walk-forward; the False Strategy Theorem.)</li>
+  <li id="r5">DeFiLlama (2026). Open on-chain data API — stablecoin supply, TVL, protocol fees. <a href="https://defillama.com/docs/api" target="_blank" rel="noopener">defillama.com/docs/api</a>.</li>
+  <li id="r6">B. Vine (2026). Alpha Research, Papers 1–7. The crypto carry (Paper 2) and trend (Paper 4) sleeves this overlay rotates.</li>
+</ol>
+
+<footer>
+  <p>The autonomous successor to the <a href="index.html">Alpha Research</a> series. Code, the rigor harness, figures, and the complete dated research log:
+  <a href="https://github.com/bryanvine/alpha-research" target="_blank" rel="noopener">github.com/bryanvine/alpha-research</a>.
+  All experiments are leak-controlled and reproducible from raw data. © 2026 Bryan Vine.</p>
+</footer>
+
+</div>
+</body>
+</html>

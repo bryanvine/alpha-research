@@ -10,7 +10,7 @@ The unit of output is a paper backed by a fully reproducible pipeline: every
 claimed edge must clear a fixed statistical-rigor bar, and every backtest is net
 of realistic transaction costs. Negative results are first-class outcomes.
 
-## The series (complete — 7 papers, published)
+## The series (8 papers, published)
 
 Live at **[bryanvine.github.io/alpha-research](https://bryanvine.github.io/alpha-research/)**.
 Each title links to the paper; the one-line verdict is in *italics*.
@@ -36,6 +36,11 @@ Each title links to the paper; the one-line verdict is in *italics*.
 7. **[Synthesis: Do the Modest Edges Add Up?](https://bryanvine.github.io/alpha-research/paper7.html)**
    — *capstone: four near-uncorrelated ~0.4 premia diversify into a combined 0.53
    (above the QSPIX ceiling) — but the premia are decaying (2020s ≈ 0.13).*
+8. **[On-Chain Liquidity & the Crypto Premia: An Autonomous Search](https://bryanvine.github.io/alpha-research/paper8.html)**
+   — *the first paper found by a machine: an autonomous LLM loop, gated by this program's
+   rigor harness, surfaced a stablecoin-flow overlay (in-window OOS 1.18 vs 0.66, 5-day
+   mechanism t=3.22) that **died out-of-window** (t→0.48, PBO 0.11→0.51) — a fit, not an
+   edge. The automatic, honest kill is the deliverable.*
 
 **Program verdict.** The durable edges are modest, uncorrelated, *decaying* risk
 premia — compensation for **providing** liquidity / insurance / financing, never
