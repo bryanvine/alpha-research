@@ -120,14 +120,16 @@ but update monthly (Ken French) and need a broker/ETFs to trade daily, so they a
 <li>Realized volatility runs below the 10% target due to a leverage cap. <strong>Not investment advice.</strong></li>
 </ul>
 
-<h2>The seven papers</h2>
+<h2>The nine papers</h2>
 <p>1 <a href="https://bryanvine.github.io/alpha-research/paper1.html">Volatility Risk Premium</a> ·
 2 <a href="https://bryanvine.github.io/alpha-research/paper2.html">Crypto Carry</a> ·
 3 <a href="https://bryanvine.github.io/alpha-research/paper3.html">Crypto Stat-Arb</a> ·
 4 <a href="https://bryanvine.github.io/alpha-research/paper4.html">The Cost of Direction</a> ·
 5 <a href="https://bryanvine.github.io/alpha-research/paper5.html">Liquidity Provision</a> ·
 6 <a href="https://bryanvine.github.io/alpha-research/paper6.html">FX &amp; Commodity Carry</a> ·
-7 <a href="https://bryanvine.github.io/alpha-research/paper7.html">Synthesis</a></p>
+7 <a href="https://bryanvine.github.io/alpha-research/paper7.html">Synthesis</a> ·
+8 <a href="https://bryanvine.github.io/alpha-research/paper8.html">Autonomous Researcher</a> ·
+9 <a href="https://bryanvine.github.io/alpha-research/paper9.html">Machine Analyst</a></p>
 
 <footer>Paper-traded; updated daily from free data. Code &amp; full research log:
 <a href="https://github.com/bryanvine/alpha-research">github.com/bryanvine/alpha-research</a>. © {datetime.datetime.now(datetime.timezone.utc).year} Bryan Vine.</footer>

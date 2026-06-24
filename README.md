@@ -10,7 +10,7 @@ The unit of output is a paper backed by a fully reproducible pipeline: every
 claimed edge must clear a fixed statistical-rigor bar, and every backtest is net
 of realistic transaction costs. Negative results are first-class outcomes.
 
-## The series (8 papers, published)
+## The series (9 papers, published)
 
 Live at **[bryanvine.github.io/alpha-research](https://bryanvine.github.io/alpha-research/)**.
 Each title links to the paper; the one-line verdict is in *italics*.
@@ -41,6 +41,14 @@ Each title links to the paper; the one-line verdict is in *italics*.
    rigor harness, surfaced a stablecoin-flow overlay (in-window OOS 1.18 vs 0.66, 5-day
    mechanism t=3.22) that **died out-of-window** (t→0.48, PBO 0.11→0.51) — a fit, not an
    edge. The automatic, honest kill is the deliverable.*
+9. **[The Machine Analyst: Two LLM Fundamental-Valuation Bots](https://bryanvine.github.io/alpha-research/paper9.html)**
+   — *the machine as analyst, not researcher: two bots value the whole S&P 500 daily —
+   **[Vinebot](https://dbot.vineai.tech)** (Damodaran, prices everything) and
+   **[Buffybot](https://buffy.bot)** (Buffett, waits for the fat pitch) — with the LLM
+   confined to clamped assumptions while Python does the math. They triangulate (Spearman
+   0.71, 85% sign agreement) and both call mid-2026 rich, but an LLM analyst **cannot be
+   backtested** (it has already read the future); skill is unproven and the test is a
+   multi-year forward one. The honest, auditable apparatus is the deliverable.*
 
 **Program verdict.** The durable edges are modest, uncorrelated, *decaying* risk
 premia — compensation for **providing** liquidity / insurance / financing, never
